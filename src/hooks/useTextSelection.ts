@@ -77,14 +77,15 @@ export const useTextSelection = ({ onTextSelected, onSelectionCleared }: UseText
       }
     };
 
-    if (textRef.current) {
-      textRef.current.addEventListener("mouseup", handleMouseUp);
+    const currentTextRef = textRef.current;
+    if (currentTextRef) {
+      currentTextRef.addEventListener("mouseup", handleMouseUp);
       document.addEventListener("click", handleClickOutside);
     }
 
     return () => {
-      if (textRef.current) {
-        textRef.current.removeEventListener("mouseup", handleMouseUp);
+      if (currentTextRef) {
+        currentTextRef.removeEventListener("mouseup", handleMouseUp);
       }
       document.removeEventListener("click", handleClickOutside);
     };

@@ -12,24 +12,27 @@ interface LayoutWrapperProps {
 }
 
 export default function LayoutWrapper({ children }: LayoutWrapperProps) {
-  const { isCollapsed, toggleSidebar, _hasHydrated } = useSidebarStore();
+  const { isCollapsed, toggleSidebar } = useSidebarStore();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
   // 에디터 페이지에서 unsaved changes 확인
   const handleNavigation = (href: string) => {
-    if (pathname === '/editor') {
+    if (pathname === "/editor") {
       // 에디터 페이지에서 나갈 때 확인
-      const editorContent = sessionStorage.getItem('editorContent');
-      const hasRealContent = editorContent && 
-                            editorContent.trim() && 
-                            editorContent.trim().length > 0;
-      
+      const editorContent = sessionStorage.getItem("editorContent");
+      const hasRealContent =
+        editorContent && editorContent.trim() && editorContent.trim().length > 0;
+
       if (hasRealContent) {
-        if (window.confirm("입력한 내용이 있습니다. 정말 나가시겠습니까? 저장되지 않은 내용은 사라집니다.")) {
+        if (
+          window.confirm(
+            "입력한 내용이 있습니다. 정말 나가시겠습니까? 저장되지 않은 내용은 사라집니다."
+          )
+        ) {
           // 확인 후 sessionStorage 정리
-          sessionStorage.removeItem('editorContent');
+          sessionStorage.removeItem("editorContent");
           window.location.href = href;
         }
       } else {
@@ -58,7 +61,11 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
       {/* 데스크톱 사이드바 - 클라이언트에서만 표시 */}
       {!isMobile && isClient && (
         <div className="relative">
-          <Sidebar isCollapsed={isCollapsed} onToggle={toggleSidebar} onNavigate={handleNavigation} />
+          <Sidebar
+            isCollapsed={isCollapsed}
+            onToggle={toggleSidebar}
+            onNavigate={handleNavigation}
+          />
         </div>
       )}
 
@@ -71,15 +78,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
               : ""
           }`}
         >
-          <div
-            className={`mx-auto ${
-              isMobile
-                ? "w-full px-4"
-                : "w-full px-6"
-            }`}
-          >
-            {children}
-          </div>
+          <div className={`mx-auto ${isMobile ? "w-full px-4" : "w-full px-6"}`}>{children}</div>
         </main>
       </div>
 
