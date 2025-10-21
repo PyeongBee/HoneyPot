@@ -23,6 +23,7 @@ export interface ShareData {
   question: string;
   questionLimit: number;
   timestamp: string;
+  memos: Memo[];
 }
 
 export interface ShareHistory {

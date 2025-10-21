@@ -64,6 +64,7 @@ export default function EditorPage() {
         setEditedText(shareData.edited);
         setQuestionText(shareData.question || "");
         setQuestionCharLimit(shareData.questionLimit || DEFAULT_CHAR_LIMIT);
+        setMemos(shareData.memos || []);
         setViewMode("result");
         showSuccess("공유된 데이터를 불러왔습니다.");
         return;
@@ -77,11 +78,12 @@ export default function EditorPage() {
       const sharedData = localStorage.getItem(`jaso_${sharedId}`);
       if (sharedData) {
         try {
-          const { original, edited, question, questionLimit } = JSON.parse(sharedData);
+          const { original, edited, question, questionLimit, memos } = JSON.parse(sharedData);
           setOriginalText(original);
           setEditedText(edited);
           setQuestionText(question || "");
           setQuestionCharLimit(questionLimit || DEFAULT_CHAR_LIMIT);
+          setMemos(memos || []);
           setViewMode("result");
           showSuccess("공유된 데이터를 불러왔습니다.");
         } catch (error) {
@@ -169,7 +171,18 @@ export default function EditorPage() {
   };
 
   const handleModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
+    // 수정 모드로 전환할 때 메모가 있으면 확인 알림
+    if (mode === "edit" && memos.length > 0) {
+      const confirmed = window.confirm(
+        "수정 모드로 전환하면 기존 메모 데이터가 모두 삭제됩니다. 계속하시겠습니까?"
+      );
+      if (confirmed) {
+        setMemos([]); // 메모 목록 초기화
+        setViewMode(mode);
+      }
+    } else {
+      setViewMode(mode);
+    }
   };
 
   const handleShareClick = useCallback(() => {
@@ -180,6 +193,7 @@ export default function EditorPage() {
         question: questionText,
         questionLimit: questionCharLimit,
         timestamp: new Date().toISOString(),
+        memos: memos,
       };
 
       // URL 기반 공유 URL 생성
@@ -198,7 +212,7 @@ export default function EditorPage() {
       console.error("공유 데이터 생성 실패:", error);
       showError("공유 링크 생성에 실패했습니다.");
     }
-  }, [originalText, editedText, questionText, questionCharLimit, showSuccess, showError]);
+  }, [originalText, editedText, questionText, questionCharLimit, memos, showSuccess, showError]);
 
   const handleCopyUrl = useCallback(async () => {
     const result = await copyToClipboard(shareUrl);
