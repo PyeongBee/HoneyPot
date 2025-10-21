@@ -2,7 +2,7 @@
  * 에디터 관련 타입 정의
  */
 
-export type ViewMode = 'original' | 'edit' | 'result';
+export type ViewMode = "original" | "edit" | "result";
 
 export interface EditorState {
   originalText: string;
@@ -31,6 +31,21 @@ export interface ShareHistory {
   url: string;
   shareData: ShareData;
   createdAt: string;
+}
+
+export interface Memo {
+  id: string;
+  text: string;
+  selectedText: string;
+  startIndex: number;
+  endIndex: number;
+  timestamp: string;
+}
+
+export interface SelectionInfo {
+  text: string;
+  startIndex: number;
+  endIndex: number;
 }
 
 export interface CharacterCountProps {

@@ -1,12 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { LazyDiffViewer, LazyEditor, LazyOriginalEditor, LazySpellCheckSidebar } from "../../components/lazy/index";
+import {
+  LazyDiffViewer,
+  LazyEditor,
+  LazyOriginalEditor,
+  LazySpellCheckSidebar,
+} from "../../components/lazy/index";
 import { useSidebarStore } from "../../stores/sidebarStore";
 import { useDeviceStore } from "../../stores/deviceStore";
 import { useSpellCheckStore } from "../../stores/spellCheckStore";
 import { useToastStore } from "../../stores/toastStore";
-import { ViewMode, ShareData } from "../../types/editor";
+import { ViewMode, ShareData, Memo } from "../../types/editor";
 import { getTextStats } from "../../utils/textUtils";
 import CharacterCount from "../../components/common/CharacterCount";
 import {
@@ -25,10 +30,7 @@ import {
 } from "../../constants/editor";
 import { ModeButton } from "../../components/common/ModeButton";
 import { Button } from "../../components/common/Button";
-import {
-  InputLabel,
-  InputField,
-} from "../../components/common/Input";
+import { InputLabel, InputField } from "../../components/common/Input";
 import { Share2 } from "lucide-react";
 import Toast from "../../components/common/Toast";
 
@@ -37,27 +39,23 @@ export const dynamic = "force-dynamic";
 export default function EditorPage() {
   const { isCollapsed } = useSidebarStore();
   const { isMobile, checkDevice } = useDeviceStore();
-  const { 
-    isSpellCheckMode, 
-    getCheckedSuggestions, 
-    setSpellCheckMode, 
-    clearSuggestions 
-  } = useSpellCheckStore();
+  const { isSpellCheckMode, getCheckedSuggestions, setSpellCheckMode, clearSuggestions } =
+    useSpellCheckStore();
   const { toasts, showSuccess, showError, removeToast } = useToastStore();
   const [originalText, setOriginalText] = useState<string>("");
   const [editedText, setEditedText] = useState<string>("");
   const [questionText, setQuestionText] = useState<string>("");
-  const [questionCharLimit, setQuestionCharLimit] =
-    useState<number>(DEFAULT_CHAR_LIMIT);
+  const [questionCharLimit, setQuestionCharLimit] = useState<number>(DEFAULT_CHAR_LIMIT);
   const [viewMode, setViewMode] = useState<ViewMode>("original");
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
   const [lastScrollY, setLastScrollY] = useState<number>(0);
   const [shareUrl, setShareUrl] = useState<string>("");
   const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [memos, setMemos] = useState<Memo[]>([]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    
+
     const encodedData = urlParams.get("data");
     if (encodedData) {
       const shareData = decodeShareData(encodedData);
@@ -73,14 +71,13 @@ export default function EditorPage() {
         showError("공유 데이터를 불러오는데 실패했습니다.");
       }
     }
-    
+
     const sharedId = urlParams.get("share");
     if (sharedId) {
       const sharedData = localStorage.getItem(`jaso_${sharedId}`);
       if (sharedData) {
         try {
-          const { original, edited, question, questionLimit } =
-            JSON.parse(sharedData);
+          const { original, edited, question, questionLimit } = JSON.parse(sharedData);
           setOriginalText(original);
           setEditedText(edited);
           setQuestionText(question || "");
@@ -102,7 +99,7 @@ export default function EditorPage() {
     // URL 파라미터가 없는 새로운 세션인 경우 sessionStorage 초기화
     const urlParams = new URLSearchParams(window.location.search);
     if (!urlParams.get("data") && !urlParams.get("share")) {
-      sessionStorage.removeItem('editorContent');
+      sessionStorage.removeItem("editorContent");
     }
   }, []);
 
@@ -139,9 +136,9 @@ export default function EditorPage() {
     // 에디터 내용 변경 시 sessionStorage에 저장/삭제
     const totalContent = text + editedText + questionText;
     if (totalContent.trim()) {
-      sessionStorage.setItem('editorContent', totalContent);
+      sessionStorage.setItem("editorContent", totalContent);
     } else {
-      sessionStorage.removeItem('editorContent');
+      sessionStorage.removeItem("editorContent");
     }
   };
 
@@ -150,9 +147,9 @@ export default function EditorPage() {
     // 에디터 내용 변경 시 sessionStorage에 저장/삭제
     const totalContent = originalText + text + questionText;
     if (totalContent.trim()) {
-      sessionStorage.setItem('editorContent', totalContent);
+      sessionStorage.setItem("editorContent", totalContent);
     } else {
-      sessionStorage.removeItem('editorContent');
+      sessionStorage.removeItem("editorContent");
     }
   };
 
@@ -161,9 +158,9 @@ export default function EditorPage() {
     // 에디터 내용 변경 시 sessionStorage에 저장/삭제
     const totalContent = originalText + editedText + text;
     if (totalContent.trim()) {
-      sessionStorage.setItem('editorContent', totalContent);
+      sessionStorage.setItem("editorContent", totalContent);
     } else {
-      sessionStorage.removeItem('editorContent');
+      sessionStorage.removeItem("editorContent");
     }
   };
 
@@ -174,7 +171,6 @@ export default function EditorPage() {
   const handleModeChange = (mode: ViewMode) => {
     setViewMode(mode);
   };
-
 
   const handleShareClick = useCallback(() => {
     try {
@@ -190,13 +186,13 @@ export default function EditorPage() {
       const url = createShareUrl(shareData);
 
       setShareUrl(url);
-      
+
       const shareId = generateShareId();
       localStorage.setItem(`jaso_${shareId}`, JSON.stringify(shareData));
-      
+
       // 공유 기록을 로컬스토리지에 저장
       saveShareHistory(shareData, url);
-      
+
       showSuccess("공유 링크가 생성되었습니다.");
     } catch (error) {
       console.error("공유 데이터 생성 실패:", error);
@@ -215,32 +211,63 @@ export default function EditorPage() {
     }
   }, [shareUrl, showSuccess, showError]);
 
+  // 메모 관련 핸들러들
+  const handleAddMemo = useCallback((memo: Memo) => {
+    setMemos((prev) => [...prev, memo]);
+  }, []);
+
+  const handleDeleteMemo = useCallback((memoId: string) => {
+    setMemos((prev) => prev.filter((memo) => memo.id !== memoId));
+  }, []);
+
+  const [highlightedMemo, setHighlightedMemo] = useState<string | null>(null);
+
+  const handleMemoClick = useCallback((memo: Memo) => {
+    // 메모 클릭 시 해당 텍스트 부분으로 스크롤하고 하이라이트
+    setHighlightedMemo(memo.id);
+    // 하이라이트를 일정 시간 후 자동으로 해제
+    setTimeout(() => setHighlightedMemo(null), 3000);
+  }, []);
+
+  const handleMemoHover = useCallback((memoId: string | null) => {
+    setHighlightedMemo(memoId);
+  }, []);
 
   const handleApplyCorrections = useCallback(() => {
     const checkedSuggestions = getCheckedSuggestions();
-    
+
     if (checkedSuggestions.length === 0) {
       showError("적용할 교정 사항을 선택해주세요.");
       return;
     }
 
     let correctedText = editedText;
-    
+
     const sortedSuggestions = [...checkedSuggestions].sort((a, b) => b.start - a.start);
-    
+
     sortedSuggestions.forEach((suggestion) => {
       const selectedCorrection = suggestion.selectedSuggestion || suggestion.suggestions[0];
       const before = correctedText.slice(0, suggestion.start);
-      const after = correctedText.slice(suggestion.end || (suggestion.start + suggestion.token.length));
+      const after = correctedText.slice(
+        suggestion.end || suggestion.start + suggestion.token.length
+      );
       correctedText = before + selectedCorrection + after;
     });
 
     setEditedText(correctedText);
     setSpellCheckMode(false);
     clearSuggestions();
-    
+
     showSuccess(`${checkedSuggestions.length}개의 교정 사항이 적용되었습니다.`);
-  }, [editedText, getCheckedSuggestions, setEditedText, setSpellCheckMode, clearSuggestions, showSuccess, showError]);
+  }, [
+    editedText,
+    getCheckedSuggestions,
+    setEditedText,
+    setSpellCheckMode,
+    clearSuggestions,
+    showSuccess,
+    showError,
+  ]);
 
   const ModeChangeButton = ({
     mode,
@@ -259,9 +286,7 @@ export default function EditorPage() {
       aria-controls="editor-content"
       tabIndex={viewMode === mode ? 0 : -1}
     >
-      <span className={`hidden ${isMobile ? "" : "inline"}`}>
-        {modeText} 모드
-      </span>
+      <span className={`hidden ${isMobile ? "" : "inline"}`}>{modeText} 모드</span>
       <span className={`${isMobile ? "" : "hidden"}`}>{modeText}</span>
     </ModeButton>
   );
@@ -283,16 +308,8 @@ export default function EditorPage() {
           <h1 className="text-2xl font-semibold truncate">자소서 에디터</h1>
         </div>
 
-        <div
-          className="flex gap-4"
-          role="tablist"
-          aria-label="에디터 모드 선택"
-        >
-          <ModeChangeButton
-            mode="original"
-            modeText="원본"
-            isMobile={isMobile}
-          />
+        <div className="flex gap-4" role="tablist" aria-label="에디터 모드 선택">
+          <ModeChangeButton mode="original" modeText="원본" isMobile={isMobile} />
           <ModeChangeButton mode="edit" modeText="수정" isMobile={isMobile} />
           <ModeChangeButton mode="result" modeText="결과" isMobile={isMobile} />
         </div>
@@ -300,7 +317,6 @@ export default function EditorPage() {
 
       <div className="mt-20 px-6 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
-
           {viewMode === "original" ? (
             <div className="lg:col-span-3">
               <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
@@ -348,18 +364,14 @@ export default function EditorPage() {
                     type="number"
                     value={questionCharLimit}
                     onChange={(value) =>
-                      handleQuestionLimitChange(
-                        parseInt(value) || DEFAULT_CHAR_LIMIT
-                      )
+                      handleQuestionLimitChange(parseInt(value) || DEFAULT_CHAR_LIMIT)
                     }
                     className="w-24 text-center font-medium"
                     min={MIN_CHAR_LIMIT}
                     max={MAX_CHAR_LIMIT}
                     step={CHAR_LIMIT_STEP}
                   />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    자
-                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">자</span>
                 </div>
                 <div className="flex flex-wrap justify-around gap-2">
                   {[500, 1000, 1500, 2000].map((limit) => (
@@ -399,9 +411,7 @@ export default function EditorPage() {
         >
           <div
             className={
-              viewMode === "original" ||
-              viewMode === "edit" ||
-              viewMode === "result"
+              viewMode === "original" || viewMode === "edit" || viewMode === "result"
                 ? "lg:col-span-3"
                 : ""
             }
@@ -421,47 +431,98 @@ export default function EditorPage() {
               <LazyDiffViewer
                 originalText={originalText}
                 editedText={editedText}
-                charLimit={questionCharLimit}
+                memos={memos}
+                onAddMemo={handleAddMemo}
+                highlightedMemo={highlightedMemo}
               />
             )}
           </div>
 
-          {(viewMode === "original" ||
-            viewMode === "edit" ||
-            viewMode === "result") && (
+          {(viewMode === "original" || viewMode === "edit" || viewMode === "result") && (
             <div className="lg:col-span-1">
               {viewMode === "edit" && isSpellCheckMode ? (
                 <div className="sticky top-24">
                   <LazySpellCheckSidebar onApplyCorrections={handleApplyCorrections} />
                 </div>
               ) : (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
-                  <CharacterCount
-                    characterCount={
-                      viewMode === "original"
-                        ? getTextStats(originalText, questionCharLimit)
-                            .characterCount
-                        : getTextStats(editedText, questionCharLimit)
-                            .characterCount
-                    }
-                    wordCount={
-                      viewMode === "original"
-                        ? getTextStats(originalText, questionCharLimit).wordCount
-                        : getTextStats(editedText, questionCharLimit).wordCount
-                    }
-                    lineCount={
-                      viewMode === "original"
-                        ? getTextStats(originalText, questionCharLimit).lineCount
-                        : getTextStats(editedText, questionCharLimit).lineCount
-                    }
-                    charLimit={questionCharLimit}
-                    isOverLimit={
-                      viewMode === "original"
-                        ? getTextStats(originalText, questionCharLimit)
-                            .isOverLimit
-                        : getTextStats(editedText, questionCharLimit).isOverLimit
-                    }
-                  />
+                <div className="space-y-4 sticky top-24">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4">
+                    <CharacterCount
+                      characterCount={
+                        viewMode === "original"
+                          ? getTextStats(originalText, questionCharLimit).characterCount
+                          : getTextStats(editedText, questionCharLimit).characterCount
+                      }
+                      wordCount={
+                        viewMode === "original"
+                          ? getTextStats(originalText, questionCharLimit).wordCount
+                          : getTextStats(editedText, questionCharLimit).wordCount
+                      }
+                      lineCount={
+                        viewMode === "original"
+                          ? getTextStats(originalText, questionCharLimit).lineCount
+                          : getTextStats(editedText, questionCharLimit).lineCount
+                      }
+                      charLimit={questionCharLimit}
+                      isOverLimit={
+                        viewMode === "original"
+                          ? getTextStats(originalText, questionCharLimit).isOverLimit
+                          : getTextStats(editedText, questionCharLimit).isOverLimit
+                      }
+                    />
+                  </div>
+
+                  {/* 메모 목록 - 결과 모드에서만 표시 */}
+                  {viewMode === "result" && (
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          메모 목록 ({memos.length})
+                        </h3>
+                      </div>
+                      <div className="p-4 max-h-96 overflow-y-auto">
+                        {memos.length === 0 ? (
+                          <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+                            아직 메모가 없습니다. 텍스트를 선택하고 메모를 추가해보세요.
+                          </p>
+                        ) : (
+                          <div className="space-y-3">
+                            {memos.map((memo) => (
+                              <div
+                                key={memo.id}
+                                className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 hover:border-yellow-300 dark:hover:border-yellow-700 transition-all duration-200 cursor-pointer"
+                                onClick={() => handleMemoClick(memo)}
+                                onMouseEnter={() => handleMemoHover(memo.id)}
+                                onMouseLeave={() => handleMemoHover(null)}
+                                title="클릭하여 해당 텍스트로 이동"
+                              >
+                                <div className="flex justify-between items-start mb-2">
+                                  <div className="flex-1">
+                                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                                      {memo.text}
+                                    </p>
+                                  </div>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteMemo(memo.id);
+                                    }}
+                                    className="ml-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm"
+                                    title="메모 삭제"
+                                  >
+                                    🗑️
+                                  </button>
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  {new Date(memo.timestamp).toLocaleString("ko-KR")}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -495,9 +556,7 @@ export default function EditorPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                공유 링크
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">공유 링크</h3>
               <button
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none"
                 onClick={() => setShareUrl("")}
