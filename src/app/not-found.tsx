@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Home, ArrowLeft } from "lucide-react";
-import { NAVIGATION } from "../constants";
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Home, ArrowLeft } from 'lucide-react';
+import { NAVIGATION } from '../constants';
 
 export default function NotFound() {
   return (
@@ -29,8 +29,7 @@ export default function NotFound() {
             페이지를 찾을 수 없습니다
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-            요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.
-            <br />
+            요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.<br />
             URL을 다시 확인해 주세요.
           </p>
         </div>
@@ -44,7 +43,7 @@ export default function NotFound() {
             <Home className="w-5 h-5 mr-2" />
             자소서 에디터로 이동
           </Link>
-
+          
           <button
             onClick={() => window.history.back()}
             className="inline-flex items-center justify-center w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 active:bg-gray-300 transition-colors duration-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:active:bg-gray-500"
@@ -57,9 +56,9 @@ export default function NotFound() {
         {/* 추가 도움말 */}
         <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            문제가 지속되면{" "}
-            <a
-              href="mailto:support@example.com"
+            문제가 지속되면{' '}
+            <a 
+              href="mailto:support@example.com" 
               className="text-brand-500 hover:text-brand-600 underline"
             >
               고객지원
