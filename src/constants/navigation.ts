@@ -5,19 +5,19 @@
 import { FileText, MoreHorizontal, Settings, Activity, LogIn, LogOut } from "lucide-react";
 
 export const NAVIGATION = {
-  LOGO_PATH: '/logo_Bee_lsh_clear_gra.png',
-  LOGO_ALT: '로고',
-  APP_NAME: '평비의 꿀단지',
+  LOGO_PATH: "/vercel.png",
+  LOGO_ALT: "로고",
+  APP_NAME: "꿀단지",
 } as const;
 
 // 메뉴 라벨 상수
 export const MENU_LABELS = {
-  MORE_MENU: '더 보기',
-  EDITOR: '자소서 에디터',
-  ACTIVITY: '내활동',
-  SETTINGS: '설정',
-  LOGIN: '로그인',
-  LOGOUT: '로그아웃',
+  MORE_MENU: "더 보기",
+  EDITOR: "자소서 에디터",
+  ACTIVITY: "내활동",
+  SETTINGS: "설정",
+  LOGIN: "로그인",
+  LOGOUT: "로그아웃",
 } as const;
 
 // 메인 메뉴 아이템
