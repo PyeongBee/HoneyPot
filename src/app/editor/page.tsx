@@ -20,6 +20,7 @@ import {
   MAX_CHAR_LIMIT,
   MIN_CHAR_LIMIT,
 } from "../../constants/editor";
+import { useConfirmStore } from "../../stores/confirmStore";
 import { useDeviceStore } from "../../stores/deviceStore";
 import { useSidebarStore } from "../../stores/sidebarStore";
 import { useSpellCheckStore } from "../../stores/spellCheckStore";
@@ -42,6 +43,7 @@ export default function EditorPage() {
   const { isSpellCheckMode, getCheckedSuggestions, setSpellCheckMode, clearSuggestions } =
     useSpellCheckStore();
   const { toasts, showSuccess, showError, removeToast } = useToastStore();
+  const { showConfirm } = useConfirmStore();
   const [originalText, setOriginalText] = useState<string>("");
   const [editedText, setEditedText] = useState<string>("");
   const [questionText, setQuestionText] = useState<string>("");
@@ -173,13 +175,15 @@ export default function EditorPage() {
   const handleModeChange = (mode: ViewMode) => {
     // 수정 모드로 전환할 때 메모가 있으면 확인 알림
     if (mode === "edit" && memos.length > 0) {
-      const confirmed = window.confirm(
-        "수정 모드로 전환하면 기존 메모 데이터가 모두 삭제됩니다. 계속하시겠습니까?"
-      );
-      if (confirmed) {
-        setMemos([]); // 메모 목록 초기화
-        setViewMode(mode);
-      }
+      showConfirm({
+        message: "수정 모드로 전환하면 기존 메모 데이터가 모두 삭제됩니다.\n계속하시겠습니까?",
+        confirmText: "계속",
+        variant: "destructive",
+        onConfirm: () => {
+          setMemos([]); // 메모 목록 초기화
+          setViewMode(mode);
+        },
+      });
     } else {
       setViewMode(mode);
     }

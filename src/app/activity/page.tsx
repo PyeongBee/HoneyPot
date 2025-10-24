@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "../../components/common/Button";
 import { Card } from "../../components/common/Card";
 import Toast from "../../components/common/Toast";
+import { useConfirmStore } from "../../stores/confirmStore";
 import { useToastStore } from "../../stores/toastStore";
 import { ShareHistory } from "../../types/editor";
 import { copyToClipboard } from "../../utils/clipboardUtils";
@@ -18,6 +19,7 @@ export default function ActivityPage() {
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toasts, showSuccess, showError, removeToast } = useToastStore();
+  const { showConfirm } = useConfirmStore();
 
   const loadShareHistory = useCallback(() => {
     try {
@@ -56,16 +58,21 @@ export default function ActivityPage() {
   };
 
   const handleClearAll = () => {
-    if (window.confirm('모든 공유 기록을 삭제하시겠습니까?')) {
-      try {
-        clearShareHistory();
-        loadShareHistory();
-        showSuccess('모든 공유 기록이 삭제되었습니다.');
-      } catch (error) {
-        console.error('공유 기록 전체 삭제 실패:', error);
-        showError('공유 기록 삭제에 실패했습니다.');
-      }
-    }
+    showConfirm({
+      message: '모든 공유 기록을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
+      confirmText: '삭제',
+      variant: 'destructive',
+      onConfirm: () => {
+        try {
+          clearShareHistory();
+          loadShareHistory();
+          showSuccess('모든 공유 기록이 삭제되었습니다.');
+        } catch (error) {
+          console.error('공유 기록 전체 삭제 실패:', error);
+          showError('공유 기록 삭제에 실패했습니다.');
+        }
+      },
+    });
   };
 
   const formatDate = (dateString: string) => {

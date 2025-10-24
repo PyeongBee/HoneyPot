@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import { MENU_ITEMS, MENU_LABELS } from "../constants/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { LONG_PRESS_DURATION, TOOLTIP_DISPLAY_DURATION } from "../constants/editor";
-import { mobileNavStyles, getMobileNavButtonClasses, cn } from "../styles/components";
+import { MENU_ITEMS, MENU_LABELS } from "../constants/navigation";
+import { useConfirmStore } from "../stores/confirmStore";
+import { cn, getMobileNavButtonClasses, mobileNavStyles } from "../styles/components";
 import MoreMenuDropdown from "./common/MoreMenuDropdown";
 
 export default function MobileNavigation() {
@@ -16,6 +17,7 @@ export default function MobileNavigation() {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { showConfirm } = useConfirmStore();
   
   // 통합된 메뉴 소스에서 가져오기
   const menuItems = MENU_ITEMS;
@@ -55,11 +57,15 @@ export default function MobileNavigation() {
                             editorContent.trim().length > 0;
       
       if (hasRealContent) {
-        if (window.confirm("입력한 내용이 있습니다. 정말 나가시겠습니까? 저장되지 않은 내용은 사라집니다.")) {
-          // 확인 후 sessionStorage 정리
-          sessionStorage.removeItem('editorContent');
-          router.push(href);
-        }
+        showConfirm({
+          message: "입력한 내용이 있습니다. 정말 나가시겠습니까?\n저장되지 않은 내용은 사라집니다.",
+          confirmText: "나가기",
+          variant: "destructive",
+          onConfirm: () => {
+            sessionStorage.removeItem('editorContent');
+            router.push(href);
+          },
+        });
       } else {
         router.push(href);
       }
