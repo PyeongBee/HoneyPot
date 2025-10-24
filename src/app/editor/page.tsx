@@ -54,6 +54,12 @@ export default function EditorPage() {
   const [shareUrl, setShareUrl] = useState<string>("");
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [memos, setMemos] = useState<Memo[]>([]);
+  const [isClient, setIsClient] = useState<boolean>(false);
+
+  // 클라이언트 hydration 감지
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -311,27 +317,29 @@ export default function EditorPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header
-        className={`
-        fixed top-0 right-0 z-[1000] 
-        bg-gradient-to-br from-brand-400 to-brand-500 text-white
-        px-8 py-2 shadow-lg
-        flex justify-between items-center
-        transition-all duration-300 ease-in-out
-        ${!isHeaderVisible ? "-translate-y-full" : "translate-y-0"}
-        ${isMobile ? "left-0" : isCollapsed ? "left-16" : "left-64"}
-      `}
-      >
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <h1 className="text-2xl font-semibold truncate">자소서 에디터</h1>
-        </div>
+      {isClient && (
+        <header
+          className={`
+          fixed top-0 right-0 z-[1000] 
+          bg-gradient-to-br from-brand-400 to-brand-500 text-white
+          px-8 py-2 shadow-lg
+          flex justify-between items-center
+          transition-all duration-300 ease-in-out
+          ${!isHeaderVisible ? "-translate-y-full" : "translate-y-0"}
+          ${isMobile ? "left-0" : isCollapsed ? "left-16" : "left-64"}
+        `}
+        >
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <h1 className="text-2xl font-semibold truncate">자소서 에디터</h1>
+          </div>
 
-        <div className="flex gap-4" role="tablist" aria-label="에디터 모드 선택">
-          <ModeChangeButton mode="original" modeText="원본" isMobile={isMobile} />
-          <ModeChangeButton mode="edit" modeText="수정" isMobile={isMobile} />
-          <ModeChangeButton mode="result" modeText="결과" isMobile={isMobile} />
-        </div>
-      </header>
+          <div className="flex gap-4" role="tablist" aria-label="에디터 모드 선택">
+            <ModeChangeButton mode="original" modeText="원본" isMobile={isMobile} />
+            <ModeChangeButton mode="edit" modeText="수정" isMobile={isMobile} />
+            <ModeChangeButton mode="result" modeText="결과" isMobile={isMobile} />
+          </div>
+        </header>
+      )}
 
       <div className="mt-20 px-6 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
