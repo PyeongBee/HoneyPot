@@ -1,38 +1,38 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import { Share2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Button } from "../../components/common/Button";
+import CharacterCount from "../../components/common/CharacterCount";
+import { InputField, InputLabel } from "../../components/common/Input";
+import { ModeButton } from "../../components/common/ModeButton";
+import Toast from "../../components/common/Toast";
 import {
   LazyDiffViewer,
   LazyEditor,
   LazyOriginalEditor,
   LazySpellCheckSidebar,
 } from "../../components/lazy/index";
-import { useSidebarStore } from "../../stores/sidebarStore";
+import {
+  CHAR_LIMIT_STEP,
+  COPY_SUCCESS_DURATION,
+  DEFAULT_CHAR_LIMIT,
+  MAX_CHAR_LIMIT,
+  MIN_CHAR_LIMIT,
+} from "../../constants/editor";
 import { useDeviceStore } from "../../stores/deviceStore";
+import { useSidebarStore } from "../../stores/sidebarStore";
 import { useSpellCheckStore } from "../../stores/spellCheckStore";
 import { useToastStore } from "../../stores/toastStore";
-import { ViewMode, ShareData, Memo } from "../../types/editor";
-import { getTextStats } from "../../utils/textUtils";
-import CharacterCount from "../../components/common/CharacterCount";
+import { Memo, ShareData, ViewMode } from "../../types/editor";
 import {
   copyToClipboard,
   createShareUrl,
-  generateShareId,
   decodeShareData,
+  generateShareId,
 } from "../../utils/clipboardUtils";
 import { saveShareHistory } from "../../utils/shareHistoryUtils";
-import {
-  DEFAULT_CHAR_LIMIT,
-  COPY_SUCCESS_DURATION,
-  MIN_CHAR_LIMIT,
-  MAX_CHAR_LIMIT,
-  CHAR_LIMIT_STEP,
-} from "../../constants/editor";
-import { ModeButton } from "../../components/common/ModeButton";
-import { Button } from "../../components/common/Button";
-import { InputLabel, InputField } from "../../components/common/Input";
-import { Share2 } from "lucide-react";
-import Toast from "../../components/common/Toast";
+import { getTextStats } from "../../utils/textUtils";
 
 export const dynamic = "force-dynamic";
 

@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { Share2, ExternalLink, Trash2 } from "lucide-react";
-import { ShareHistory } from "../../types/editor";
-import { 
-  getShareHistory, 
-  deleteShareHistory, 
-  clearShareHistory,
-} from "../../utils/shareHistoryUtils";
-import { copyToClipboard } from "../../utils/clipboardUtils";
-import { useToastStore } from "../../stores/toastStore";
+import { ExternalLink, Share2, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "../../components/common/Button";
 import { Card } from "../../components/common/Card";
 import Toast from "../../components/common/Toast";
+import { useToastStore } from "../../stores/toastStore";
+import { ShareHistory } from "../../types/editor";
+import { copyToClipboard } from "../../utils/clipboardUtils";
+import {
+  clearShareHistory,
+  deleteShareHistory,
+  getShareHistory,
+} from "../../utils/shareHistoryUtils";
 
 export default function ActivityPage() {
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
