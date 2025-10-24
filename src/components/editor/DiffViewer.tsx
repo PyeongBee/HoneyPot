@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
+import { useMemoHighlight } from "../../hooks/useMemoHighlight";
+import { useTextSelection } from "../../hooks/useTextSelection";
 import { Memo } from "../../types/editor";
-import MemoInput from "./MemoInput";
 import DiffTextRenderer from "./DiffTextRenderer";
 import DiffViewerHeader from "./DiffViewerHeader";
-import { useTextSelection } from "../../hooks/useTextSelection";
+import MemoInput from "./MemoInput";
 
 interface DiffViewerProps {
   originalText: string;
@@ -22,17 +23,35 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(function DiffViewer({
 }) {
   const [viewMode, setViewMode] = useState<"diff" | "final">("diff");
 
-  // 텍스트 선택 훅 사용
+  // 텍스트 선택 훅 사용 - final 모드에서만 활성화
   const { textRef, selectedText, showMemoInput, highlightedRange, handleClearSelection } =
     useTextSelection({
       onTextSelected: () => {}, // 필요시 추가 로직 구현
       onSelectionCleared: () => {}, // 필요시 추가 로직 구현
+      enabled: viewMode === "final", // 최종 결과 보기에서만 메모 추가 가능
     });
+
+  // 메모 하이라이트 훅 사용
+  const { applyHighlight } = useMemoHighlight({
+    memos,
+    highlightedMemo,
+    highlightedRange,
+  });
 
   // 메모 저장 핸들러
   const handleSaveMemo = useCallback(
     (memoText: string) => {
       if (selectedText) {
+        // 실제 텍스트와 인덱스 검증
+        const actualText = editedText.substring(selectedText.startIndex, selectedText.endIndex);
+        console.log('메모 저장:', {
+          selectedText: selectedText.text,
+          actualText,
+          startIndex: selectedText.startIndex,
+          endIndex: selectedText.endIndex,
+          match: selectedText.text === actualText
+        });
+
         const newMemo: Memo = {
           id: Date.now().toString(),
           text: memoText,
@@ -46,7 +65,7 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(function DiffViewer({
         handleClearSelection();
       }
     },
-    [selectedText, onAddMemo, handleClearSelection]
+    [selectedText, editedText, onAddMemo, handleClearSelection]
   );
 
   return (
@@ -57,7 +76,7 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(function DiffViewer({
           onViewModeChange={setViewMode}
           editedText={editedText}
         />
-        <div className="relative">
+        <div>
           <div
             ref={textRef}
             className="h-128 p-4 mb-1.5 overflow-y-auto text-gray-900 dark:text-white whitespace-pre-wrap"
@@ -72,23 +91,23 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(function DiffViewer({
                 highlightedMemo={highlightedMemo}
                 highlightedRange={highlightedRange}
               />
+            ) : editedText ? (
+              applyHighlight(editedText, 0, editedText.length)
             ) : (
-              editedText || (
-                <em className="text-gray-500 dark:text-gray-400">수정된 텍스트가 없습니다.</em>
-              )
+              <em className="text-gray-500 dark:text-gray-400">수정된 텍스트가 없습니다.</em>
             )}
           </div>
-
-          {/* 메모 입력 UI */}
-          {showMemoInput && selectedText && (
-            <MemoInput
-              selectedText={selectedText}
-              onSave={handleSaveMemo}
-              onCancel={handleClearSelection}
-            />
-          )}
         </div>
       </div>
+
+      {/* 메모 입력 UI - 최종 결과 모드에서만 표시 (컴포넌트 외부에 fixed 위치) */}
+      {viewMode === "final" && showMemoInput && selectedText && (
+        <MemoInput
+          selectedText={selectedText}
+          onSave={handleSaveMemo}
+          onCancel={handleClearSelection}
+        />
+      )}
     </div>
   );
 });

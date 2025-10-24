@@ -1,5 +1,5 @@
-import React from "react";
 import * as Diff from "diff";
+import React from "react";
 import { useMemoHighlight } from "../../hooks/useMemoHighlight";
 import { Memo } from "../../types/editor";
 
@@ -63,28 +63,36 @@ const DiffTextRenderer: React.FC<DiffTextRendererProps> = React.memo(function Di
               <span
                 key={`removed-${index}-${partIndex}`}
                 className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 px-1 rounded line-through"
+                data-removed="true"
               >
-                {applyHighlight(linePart, startPos, endPos)}
+                {linePart}
               </span>
             );
+            // removed 부분은 editedText에 없으므로 currentPosition을 증가시키지 않음
           } else if (part.added) {
             currentLine.push(
               <span
                 key={`added-${index}-${partIndex}`}
                 className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-1 rounded"
+                data-start-index={startPos}
+                data-end-index={endPos}
               >
                 {applyHighlight(linePart, startPos, endPos)}
               </span>
             );
+            currentPosition = endPos;
           } else {
             currentLine.push(
-              <span key={`unchanged-${index}-${partIndex}`}>
+              <span 
+                key={`unchanged-${index}-${partIndex}`}
+                data-start-index={startPos}
+                data-end-index={endPos}
+              >
                 {applyHighlight(linePart, startPos, endPos)}
               </span>
             );
+            currentPosition = endPos;
           }
-
-          currentPosition = endPos;
         }
 
         // 줄바꿈 처리 (마지막 파트가 아닌 경우)
@@ -95,28 +103,36 @@ const DiffTextRenderer: React.FC<DiffTextRendererProps> = React.memo(function Di
               <span
                 key={`removed-newline-${index}-${partIndex}`}
                 className="text-red-400 text-xs opacity-70 ml-1"
+                data-removed="true"
               >
                 ↵
               </span>
             );
+            // removed 부분의 줄바꿈은 editedText에 없으므로 currentPosition을 증가시키지 않음
           } else if (part.added) {
             currentLine.push(
               <span
                 key={`added-newline-${index}-${partIndex}`}
                 className="text-green-400 text-xs opacity-70 ml-1"
+                data-start-index={currentPosition}
+                data-end-index={currentPosition + 1}
               >
                 ↵
               </span>
             );
+            currentPosition++; // 줄바꿈 문자 카운트
           } else {
             currentLine.push(
               <span
                 key={`unchanged-newline-${index}-${partIndex}`}
                 className="text-gray-400 text-xs opacity-50 ml-1"
+                data-start-index={currentPosition}
+                data-end-index={currentPosition + 1}
               >
                 ↵
               </span>
             );
+            currentPosition++; // 줄바꿈 문자 카운트
           }
 
           // 현재 줄을 완성하고 새 줄 시작
@@ -127,7 +143,6 @@ const DiffTextRenderer: React.FC<DiffTextRendererProps> = React.memo(function Di
           );
           lineNumber++;
           currentLine = [];
-          currentPosition++;
         }
       });
     });

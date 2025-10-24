@@ -1,5 +1,5 @@
+import { cn, getInputClasses, type InputSize, type InputState } from '@/styles/components';
 import React from 'react';
-import { getInputClasses, type InputSize, type InputState, cn } from '@/styles/components';
 
 // Input 관련 컴포넌트들
 interface InputGroupProps {
@@ -40,6 +40,7 @@ interface InputFieldProps {
   step?: number;
   size?: InputSize;
   state?: InputState;
+  autoFocus?: boolean;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({ 
@@ -53,7 +54,8 @@ export const InputField: React.FC<InputFieldProps> = ({
   max,
   step,
   size = 'md',
-  state = 'default'
+  state = 'default',
+  autoFocus
 }) => (
   <input
     id={id}
@@ -65,5 +67,6 @@ export const InputField: React.FC<InputFieldProps> = ({
     min={min}
     max={max}
     step={step}
+    autoFocus={autoFocus}
   />
 );
