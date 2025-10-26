@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { MESSAGES } from "../../constants";
-import { useSpellCheckStore } from "../../stores/spellCheckStore";
-import { Button } from "../common/Button";
+import { Button } from "../../../../components/common/Button";
+import { MESSAGES } from "../../../../constants";
+import { useSpellCheckStore } from "../../../../stores/spellCheckStore";
 import CheckItem from "./CheckItem";
 import CheckSidebarLayout from "./CheckSidebarLayout";
 

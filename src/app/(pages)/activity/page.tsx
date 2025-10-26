@@ -1,19 +1,19 @@
 "use client";
 
-import { ExternalLink, Share2, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
-import { Button } from "../../components/common/Button";
-import { Card } from "../../components/common/Card";
-import Toast from "../../components/common/Toast";
-import { useConfirmStore } from "../../stores/confirmStore";
-import { useToastStore } from "../../stores/toastStore";
-import { ShareHistory } from "../../types/editor";
-import { copyToClipboard } from "../../utils/clipboardUtils";
+import { Button } from "@/components/common/Button";
+import { Card } from "@/components/common/Card";
+import Toast from "@/components/common/Toast";
+import { useConfirmStore } from "@/stores/confirmStore";
+import { useToastStore } from "@/stores/toastStore";
+import { ShareHistory } from "@/types/editor";
+import { copyToClipboard } from "@/utils/clipboardUtils";
 import {
   clearShareHistory,
   deleteShareHistory,
   getShareHistory,
-} from "../../utils/shareHistoryUtils";
+} from "@/utils/shareHistoryUtils";
+import { ExternalLink, Share2, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function ActivityPage() {
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
@@ -26,8 +26,8 @@ export default function ActivityPage() {
       const history = getShareHistory();
       setShareHistory(history);
     } catch (error) {
-      console.error('공유 기록 로드 실패:', error);
-      showError('공유 기록을 불러오는데 실패했습니다.');
+      console.error("공유 기록 로드 실패:", error);
+      showError("공유 기록을 불러오는데 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -40,7 +40,7 @@ export default function ActivityPage() {
   const handleCopyUrl = async (url: string) => {
     const result = await copyToClipboard(url);
     if (result.success) {
-      showSuccess('링크가 클립보드에 복사되었습니다.');
+      showSuccess("링크가 클립보드에 복사되었습니다.");
     } else {
       showError(`링크 복사 실패: ${result.message}`);
     }
@@ -50,26 +50,27 @@ export default function ActivityPage() {
     try {
       deleteShareHistory(id);
       loadShareHistory();
-      showSuccess('공유 기록이 삭제되었습니다.');
+      showSuccess("공유 기록이 삭제되었습니다.");
     } catch (error) {
-      console.error('공유 기록 삭제 실패:', error);
-      showError('공유 기록 삭제에 실패했습니다.');
+      console.error("공유 기록 삭제 실패:", error);
+      showError("공유 기록 삭제에 실패했습니다.");
     }
   };
 
   const handleClearAll = () => {
     showConfirm({
-      message: '모든 공유 기록을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
-      confirmText: '삭제',
-      variant: 'destructive',
+      message:
+        "모든 공유 기록을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.",
+      confirmText: "삭제",
+      variant: "destructive",
       onConfirm: () => {
         try {
           clearShareHistory();
           loadShareHistory();
-          showSuccess('모든 공유 기록이 삭제되었습니다.');
+          showSuccess("모든 공유 기록이 삭제되었습니다.");
         } catch (error) {
-          console.error('공유 기록 전체 삭제 실패:', error);
-          showError('공유 기록 삭제에 실패했습니다.');
+          console.error("공유 기록 전체 삭제 실패:", error);
+          showError("공유 기록 삭제에 실패했습니다.");
         }
       },
     });
@@ -78,10 +79,12 @@ export default function ActivityPage() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60)
+    );
+
     if (diffInMinutes < 1) {
-      return '방금 전';
+      return "방금 전";
     } else if (diffInMinutes < 60) {
       return `${diffInMinutes}분 전`;
     } else if (diffInMinutes < 60 * 24) {
@@ -91,10 +94,10 @@ export default function ActivityPage() {
       const days = Math.floor(diffInMinutes / (60 * 24));
       return `${days}일 전`;
     } else {
-      return date.toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+      return date.toLocaleDateString("ko-KR", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     }
   };
@@ -151,7 +154,7 @@ export default function ActivityPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {shareHistory.map((item) => (
+              {shareHistory.map(item => (
                 <div
                   key={item.id}
                   className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -164,14 +167,14 @@ export default function ActivityPage() {
                         {item.title}
                       </h3>
                     </div>
-                    
+
                     {/* 4열: 시간 (우측 정렬) */}
                     <div className="col-span-1 text-right">
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {formatDate(item.createdAt)}
                       </p>
                     </div>
-                    
+
                     {/* 5열: 버튼들 */}
                     <div className="col-span-1 flex items-center justify-end space-x-1">
                       <div title="링크 복사">
@@ -187,7 +190,7 @@ export default function ActivityPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => window.open(item.url, '_blank')}
+                          onClick={() => window.open(item.url, "_blank")}
                         >
                           <ExternalLink className="w-4 h-4" />
                         </Button>
@@ -215,7 +218,7 @@ export default function ActivityPage() {
                           {item.title}
                         </h3>
                       </div>
-                      
+
                       {/* 버튼들 (2열) */}
                       <div className="col-span-2 flex items-center justify-end space-x-1">
                         <div title="링크 복사">
@@ -232,7 +235,7 @@ export default function ActivityPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => window.open(item.url, '_blank')}
+                            onClick={() => window.open(item.url, "_blank")}
                             className="p-1.5"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
@@ -250,7 +253,7 @@ export default function ActivityPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* 2행: 시간 정보 */}
                     <div className="flex justify-start">
                       <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -258,15 +261,18 @@ export default function ActivityPage() {
                       </p>
                     </div>
                   </div>
-                  
+
                   {/* 2행: 수정된 결과 (전체 너비) */}
                   {item.shareData.edited && (
                     <div className="w-full p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                      <p className="text-sm text-gray-700 dark:text-gray-300 overflow-hidden" style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: 'vertical'
-                      }}>
+                      <p
+                        className="text-sm text-gray-700 dark:text-gray-300 overflow-hidden"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
                         {item.shareData.edited}
                       </p>
                     </div>
@@ -280,7 +286,7 @@ export default function ActivityPage() {
 
       {/* 토스트 메시지 */}
       <div className="fixed bottom-4 right-4 z-50 space-y-2">
-        {toasts.map((toast) => (
+        {toasts.map((toast: Toast) => (
           <Toast
             key={toast.id}
             message={toast.message}

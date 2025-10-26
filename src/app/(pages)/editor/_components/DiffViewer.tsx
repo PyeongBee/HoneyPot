@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
-import { useMemoHighlight } from "../../hooks/useMemoHighlight";
-import { useTextSelection } from "../../hooks/useTextSelection";
-import { Memo } from "../../types/editor";
+import { useMemoHighlight } from "../../../../hooks/useMemoHighlight";
+import { useTextSelection } from "../../../../hooks/useTextSelection";
+import { Memo } from "../../../../types/editor";
 import DiffTextRenderer from "./DiffTextRenderer";
 import DiffViewerHeader from "./DiffViewerHeader";
 import MemoInput from "./MemoInput";
@@ -26,12 +26,17 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(function DiffViewer({
   const isFinalMode = viewMode === "final";
 
   // 텍스트 선택 훅 - 최종 결과 모드에서만 활성화
-  const { textRef, selectedText, showMemoInput, highlightedRange, handleClearSelection } =
-    useTextSelection({
-      onTextSelected: () => {},
-      onSelectionCleared: () => {},
-      enabled: isFinalMode,
-    });
+  const {
+    textRef,
+    selectedText,
+    showMemoInput,
+    highlightedRange,
+    handleClearSelection,
+  } = useTextSelection({
+    onTextSelected: () => {},
+    onSelectionCleared: () => {},
+    enabled: isFinalMode,
+  });
 
   // 메모 하이라이트 훅
   const { applyHighlight } = useMemoHighlight({
@@ -82,7 +87,11 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(function DiffViewer({
     }
 
     if (!editedText) {
-      return <em className="text-gray-500 dark:text-gray-400">수정된 텍스트가 없습니다.</em>;
+      return (
+        <em className="text-gray-500 dark:text-gray-400">
+          수정된 텍스트가 없습니다.
+        </em>
+      );
     }
 
     return applyHighlight(editedText, 0, editedText.length);

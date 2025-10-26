@@ -1,25 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import Toast from "../../components/common/Toast";
-import EditorModeSelector from "../../components/editor/EditorModeSelector";
-import EditorSidebar from "../../components/editor/EditorSidebar";
+import Toast from "@/components/common/Toast";
 import {
   LazyDiffViewer,
   LazyEditor,
   LazyOriginalEditor,
   LazyQualityCheckSidebar,
   LazySpellCheckSidebar,
-} from "../../components/lazy/index";
-import { useEditorState } from "../../hooks/useEditorState";
-import { useShareFeature } from "../../hooks/useShareFeature";
-import { useTextCorrections } from "../../hooks/useTextCorrections";
-import { useUnsavedChanges } from "../../hooks/useUnsavedChanges";
-import { useConfirmStore } from "../../stores/confirmStore";
-import { useDeviceStore } from "../../stores/deviceStore";
-import { useSpellCheckStore } from "../../stores/spellCheckStore";
-import { useToastStore } from "../../stores/toastStore";
-import { getTextStats } from "../../utils/textUtils";
+} from "@/components/lazy/index";
+import { useEditorState } from "@/hooks/useEditorState";
+import { useShareFeature } from "@/hooks/useShareFeature";
+import { useTextCorrections } from "@/hooks/useTextCorrections";
+import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
+import { useConfirmStore } from "@/stores/confirmStore";
+import { useDeviceStore } from "@/stores/deviceStore";
+import { useSpellCheckStore } from "@/stores/spellCheckStore";
+import { useToastStore } from "@/stores/toastStore";
+import { getTextStats } from "@/utils/textUtils";
+import { useCallback, useEffect, useState } from "react";
+import EditorModeSelector from "../../(pages)/editor/_components/EditorModeSelector";
+import EditorSidebar from "../../(pages)/editor/_components/EditorSidebar";
 
 export const dynamic = "force-dynamic";
 
@@ -277,7 +277,7 @@ export default function EditorPage() {
       </div>
 
       {/* 토스트 알림 */}
-      {toasts.map(toast => (
+      {toasts.map((toast: Toast) => (
         <Toast
           key={toast.id}
           message={toast.message}

@@ -6,8 +6,8 @@
 
 import { CheckSquare, FileCheck } from "lucide-react";
 import React from "react";
-import { MESSAGES } from "../../constants";
-import { Button } from "../common/Button";
+import { Button } from "../../../../components/common/Button";
+import { MESSAGES } from "../../../../constants";
 
 interface EditorActionsProps {
   isSpellCheckMode: boolean;

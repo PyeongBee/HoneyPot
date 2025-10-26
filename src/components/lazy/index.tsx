@@ -12,13 +12,16 @@ const LoadingSpinner = () => (
 );
 
 // 에디터 컴포넌트들을 동적 import
-export const LazyEditor = dynamic(() => import("../editor/Editor"), {
-  loading: LoadingSpinner,
-  ssr: false,
-});
+export const LazyEditor = dynamic(
+  () => import("../../app/(pages)/editor/_components/Editor"),
+  {
+    loading: LoadingSpinner,
+    ssr: false,
+  }
+);
 
 export const LazySpellCheckSidebar = dynamic(
-  () => import("../editor/SpellCheckSidebar"),
+  () => import("../../app/(pages)/editor/_components/SpellCheckSidebar"),
   {
     loading: LoadingSpinner,
     ssr: false,
@@ -26,7 +29,7 @@ export const LazySpellCheckSidebar = dynamic(
 );
 
 export const LazyQualityCheckSidebar = dynamic(
-  () => import("../editor/QualityCheckSidebar"),
+  () => import("../../app/(pages)/editor/_components/QualityCheckSidebar"),
   {
     loading: LoadingSpinner,
     ssr: false,
@@ -34,20 +37,23 @@ export const LazyQualityCheckSidebar = dynamic(
 );
 
 export const LazyQualityHighlightedText = dynamic(
-  () => import("../editor/QualityHighlightedText"),
+  () => import("../../app/(pages)/editor/_components/QualityHighlightedText"),
   {
     loading: LoadingSpinner,
     ssr: false,
   }
 );
 
-export const LazyDiffViewer = dynamic(() => import("../editor/DiffViewer"), {
-  loading: LoadingSpinner,
-  ssr: false,
-});
+export const LazyDiffViewer = dynamic(
+  () => import("../../app/(pages)/editor/_components/DiffViewer"),
+  {
+    loading: LoadingSpinner,
+    ssr: false,
+  }
+);
 
 export const LazyOriginalEditor = dynamic(
-  () => import("../editor/OriginalEditor"),
+  () => import("../../app/(pages)/editor/_components/OriginalEditor"),
   {
     loading: LoadingSpinner,
     ssr: false,

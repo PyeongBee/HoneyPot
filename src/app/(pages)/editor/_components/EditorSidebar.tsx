@@ -6,16 +6,16 @@
 
 import { Share2 } from "lucide-react";
 import React from "react";
+import { Button } from "../../../../components/common/Button";
+import { InputField, InputLabel } from "../../../../components/common/Input";
+import { Section } from "../../../../components/common/Section";
 import {
   CHAR_LIMIT_STEP,
   MAX_CHAR_LIMIT,
   MIN_CHAR_LIMIT,
-} from "../../constants/editor";
-import { Memo, ViewMode } from "../../types/editor";
-import { TextStats } from "../../utils/textUtils";
-import { Button } from "../common/Button";
-import { InputField, InputLabel } from "../common/Input";
-import { Section } from "../common/Section";
+} from "../../../../constants/editor";
+import { Memo, ViewMode } from "../../../../types/editor";
+import { TextStats } from "../../../../utils/textUtils";
 import CharacterCount from "./CharacterCount";
 
 interface EditorSidebarProps {

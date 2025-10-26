@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "../../styles/components";
+import { cn } from "../../../../styles/components";
 
 interface ModeButtonProps {
   active: boolean;

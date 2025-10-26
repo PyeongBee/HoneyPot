@@ -1,6 +1,6 @@
 import React from "react";
-import { CharacterCountProps } from "../../types/editor";
-import { formatNumber } from "../../utils/textUtils";
+import { CharacterCountProps } from "../../../../types/editor";
+import { formatNumber } from "../../../../utils/textUtils";
 // 통계 관련 작은 컴포넌트들
 interface LabelProps {
   children: React.ReactNode;

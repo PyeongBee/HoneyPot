@@ -5,13 +5,13 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { MESSAGES } from "../../constants";
-import { useQualityCheck } from "../../hooks/useQualityCheck";
-import { useSpellCheck } from "../../hooks/useSpellCheck";
-import { useQualityCheckStore } from "../../stores/qualityCheckStore";
-import { useToastStore } from "../../stores/toastStore";
-import { cn } from "../../styles/components";
-import Toast from "../common/Toast";
+import Toast from "../../../../components/common/Toast";
+import { MESSAGES } from "../../../../constants";
+import { useQualityCheck } from "../../../../hooks/useQualityCheck";
+import { useSpellCheck } from "../../../../hooks/useSpellCheck";
+import { useQualityCheckStore } from "../../../../stores/qualityCheckStore";
+import { useToastStore } from "../../../../stores/toastStore";
+import { cn } from "../../../../styles/components";
 import EditorActions from "./EditorActions";
 import HighlightedText from "./HighlightedText";
 import QualityHighlightedText from "./QualityHighlightedText";

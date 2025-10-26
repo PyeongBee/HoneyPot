@@ -1,14 +1,17 @@
 "use client";
 
 import React from "react";
-import { useSpellCheckStore } from "../../stores/spellCheckStore";
+import { useSpellCheckStore } from "../../../../stores/spellCheckStore";
 
 interface HighlightedTextProps {
   text: string;
   className?: string;
 }
 
-const HighlightedText: React.FC<HighlightedTextProps> = ({ text, className = "" }) => {
+const HighlightedText: React.FC<HighlightedTextProps> = ({
+  text,
+  className = "",
+}) => {
   const { suggestions, hoveredSuggestionId } = useSpellCheckStore();
 
   if (!text || suggestions.length === 0) {
@@ -16,13 +19,17 @@ const HighlightedText: React.FC<HighlightedTextProps> = ({ text, className = "" 
   }
 
   // 텍스트를 하이라이팅하기 위해 토큰 위치를 기반으로 분할
-  const parts: Array<{ text: string; isHighlighted: boolean; suggestionId?: string }> = [];
+  const parts: Array<{
+    text: string;
+    isHighlighted: boolean;
+    suggestionId?: string;
+  }> = [];
   let lastIndex = 0;
 
   // 위치 기준으로 정렬된 제안들
   const sortedSuggestions = [...suggestions].sort((a, b) => a.start - b.start);
 
-  sortedSuggestions.forEach((suggestion) => {
+  sortedSuggestions.forEach(suggestion => {
     // 이전 부분 추가
     if (suggestion.start > lastIndex) {
       parts.push({
@@ -38,7 +45,7 @@ const HighlightedText: React.FC<HighlightedTextProps> = ({ text, className = "" 
       suggestionId: suggestion.id,
     });
 
-    lastIndex = suggestion.end || (suggestion.start + suggestion.token.length);
+    lastIndex = suggestion.end || suggestion.start + suggestion.token.length;
   });
 
   // 마지막 부분 추가
@@ -56,13 +63,15 @@ const HighlightedText: React.FC<HighlightedTextProps> = ({ text, className = "" 
           const suggestion = suggestions.find(s => s.id === part.suggestionId);
           const isHovered = hoveredSuggestionId === part.suggestionId;
           const isChecked = suggestion?.isChecked || false;
-          
-          let bgColor = "bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200"; // 교정 필요
-          
+
+          let bgColor =
+            "bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200"; // 교정 필요
+
           if (isHovered || isChecked) {
-            bgColor = "bg-yellow-200 dark:bg-yellow-700 text-yellow-900 dark:text-yellow-100";
+            bgColor =
+              "bg-yellow-200 dark:bg-yellow-700 text-yellow-900 dark:text-yellow-100";
           }
-          
+
           return (
             <span
               key={index}
