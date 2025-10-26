@@ -14,9 +14,9 @@ import {
 import { Memo, ViewMode } from "../../types/editor";
 import { TextStats } from "../../utils/textUtils";
 import { Button } from "../common/Button";
-import CharacterCount from "../common/CharacterCount";
 import { InputField, InputLabel } from "../common/Input";
 import { Section } from "../common/Section";
+import CharacterCount from "./CharacterCount";
 
 interface EditorSidebarProps {
   viewMode: ViewMode;

@@ -1,22 +1,12 @@
-import { create } from 'zustand';
-
-export interface SpellCheckSuggestion {
-  id: string;
-  token: string;
-  suggestions: string[];
-  info: string;
-  start: number;
-  end: number;
-  isChecked: boolean;
-  selectedSuggestion?: string;
-}
+import { create } from "zustand";
+import { SpellCheckSuggestion } from "../types/components";
 
 interface SpellCheckState {
   isSpellCheckMode: boolean;
   isLoading: boolean;
   suggestions: SpellCheckSuggestion[];
   hoveredSuggestionId: string | null;
-  
+
   // Actions
   setSpellCheckMode: (mode: boolean) => void;
   setLoading: (loading: boolean) => void;
@@ -34,13 +24,13 @@ export const useSpellCheckStore = create<SpellCheckState>((set, get) => ({
   suggestions: [],
   hoveredSuggestionId: null,
 
-  setSpellCheckMode: (mode) => set({ isSpellCheckMode: mode }),
-  setLoading: (loading) => set({ isLoading: loading }),
-  setSuggestions: (suggestions) => set({ suggestions }),
-  
-  toggleSuggestionCheck: (id) =>
-    set((state) => ({
-      suggestions: state.suggestions.map((suggestion) =>
+  setSpellCheckMode: mode => set({ isSpellCheckMode: mode }),
+  setLoading: loading => set({ isLoading: loading }),
+  setSuggestions: suggestions => set({ suggestions }),
+
+  toggleSuggestionCheck: id =>
+    set(state => ({
+      suggestions: state.suggestions.map(suggestion =>
         suggestion.id === id
           ? { ...suggestion, isChecked: !suggestion.isChecked }
           : suggestion
@@ -48,18 +38,18 @@ export const useSpellCheckStore = create<SpellCheckState>((set, get) => ({
     })),
 
   setSelectedSuggestion: (id, suggestion) =>
-    set((state) => ({
-      suggestions: state.suggestions.map((s) =>
+    set(state => ({
+      suggestions: state.suggestions.map(s =>
         s.id === id ? { ...s, selectedSuggestion: suggestion } : s
       ),
     })),
 
-  setHoveredSuggestion: (id) => set({ hoveredSuggestionId: id }),
-  
+  setHoveredSuggestion: id => set({ hoveredSuggestionId: id }),
+
   clearSuggestions: () => set({ suggestions: [], hoveredSuggestionId: null }),
-  
+
   getCheckedSuggestions: () => {
     const state = get();
-    return state.suggestions.filter((s) => s.isChecked);
+    return state.suggestions.filter(s => s.isChecked);
   },
 }));

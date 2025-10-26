@@ -24,5 +24,5 @@ export interface SpellCheckSuggestion {
   start: number;
   end: number;
   isChecked: boolean;
-  selectedSuggestion: string;
+  selectedSuggestion?: string;
 }

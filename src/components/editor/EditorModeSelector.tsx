@@ -6,7 +6,7 @@
 
 import React from "react";
 import { ViewMode } from "../../types/editor";
-import { ModeButton } from "../common/ModeButton";
+import { ModeButton } from "./ModeButton";
 
 interface EditorModeSelectorProps {
   viewMode: ViewMode;
