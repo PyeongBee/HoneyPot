@@ -15,7 +15,7 @@ import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 import { useConfirmStore } from "@/stores/confirmStore";
 import { useDeviceStore } from "@/stores/deviceStore";
 import { useSpellCheckStore } from "@/stores/spellCheckStore";
-import { useToastStore } from "@/stores/toastStore";
+import { ToastData, useToastStore } from "@/stores/toastStore";
 import { getTextStats } from "@/utils/textUtils";
 import { useCallback, useEffect, useState } from "react";
 import EditorModeSelector from "../../(pages)/editor/_components/EditorModeSelector";
@@ -277,7 +277,7 @@ export default function EditorPage() {
       </div>
 
       {/* 토스트 알림 */}
-      {toasts.map((toast: Toast) => (
+      {toasts.map((toast: ToastData) => (
         <Toast
           key={toast.id}
           message={toast.message}

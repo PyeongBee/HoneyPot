@@ -4,7 +4,7 @@ import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
 import Toast from "@/components/common/Toast";
 import { useConfirmStore } from "@/stores/confirmStore";
-import { useToastStore } from "@/stores/toastStore";
+import { ToastData, useToastStore } from "@/stores/toastStore";
 import { ShareHistory } from "@/types/editor";
 import { copyToClipboard } from "@/utils/clipboardUtils";
 import {
@@ -286,7 +286,7 @@ export default function ActivityPage() {
 
       {/* 토스트 메시지 */}
       <div className="fixed bottom-4 right-4 z-50 space-y-2">
-        {toasts.map((toast: Toast) => (
+        {toasts.map((toast: ToastData) => (
           <Toast
             key={toast.id}
             message={toast.message}

@@ -1,11 +1,11 @@
 "use client";
 
+import { MENU_ITEMS } from "@/constants";
+import { getSidebarClasses } from "@/styles/components";
 import React from "react";
-import { MENU_ITEMS } from "../constants";
-import { getSidebarClasses } from "../styles/components";
-import SidebarLogo from "./layout/sidebar/SidebarLogo";
-import SidebarMenuItem from "./layout/sidebar/SidebarMenuItem";
-import SidebarToggle from "./layout/sidebar/SidebarToggle";
+import SidebarLogo from "./sidebar/SidebarLogo";
+import SidebarMenuItem from "./sidebar/SidebarMenuItem";
+import SidebarToggle from "./sidebar/SidebarToggle";
 
 interface SidebarProps {
   isCollapsed: boolean;
