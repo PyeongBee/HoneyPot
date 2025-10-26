@@ -1,13 +1,16 @@
-import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "../../styles/components";
+import React from "react";
+import { cn } from "../../../styles/components";
 
 interface SidebarToggleProps {
   isCollapsed: boolean;
   onToggle: () => void;
 }
 
-const SidebarToggle: React.FC<SidebarToggleProps> = ({ isCollapsed, onToggle }) => {
+const SidebarToggle: React.FC<SidebarToggleProps> = ({
+  isCollapsed,
+  onToggle,
+}) => {
   return (
     <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 z-10">
       <button

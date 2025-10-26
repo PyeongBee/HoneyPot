@@ -2,12 +2,12 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { MOBILE_BREAKPOINT } from "../constants/editor";
-import { useConfirmStore } from "../stores/confirmStore";
-import { useSidebarStore } from "../stores/sidebarStore";
+import { MOBILE_BREAKPOINT } from "../../constants/editor";
+import { useConfirmStore } from "../../stores/confirmStore";
+import { useSidebarStore } from "../../stores/sidebarStore";
+import ConfirmDialog from "../common/ConfirmDialog";
 import MobileNavigation from "./MobileNavigation";
 import Sidebar from "./Sidebar";
-import ConfirmDialog from "./common/ConfirmDialog";
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -26,11 +26,14 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
       // 에디터 페이지에서 나갈 때 확인
       const editorContent = sessionStorage.getItem("editorContent");
       const hasRealContent =
-        editorContent && editorContent.trim() && editorContent.trim().length > 0;
+        editorContent &&
+        editorContent.trim() &&
+        editorContent.trim().length > 0;
 
       if (hasRealContent) {
         showConfirm({
-          message: "입력한 내용이 있습니다. 정말 나가시겠습니까?\n저장되지 않은 내용은 사라집니다.",
+          message:
+            "입력한 내용이 있습니다. 정말 나가시겠습니까?\n저장되지 않은 내용은 사라집니다.",
           confirmText: "나가기",
           variant: "destructive",
           onConfirm: () => {
@@ -82,7 +85,11 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
                 : ""
             }`}
           >
-            <div className={`mx-auto ${isMobile ? "w-full px-4" : "w-full px-6"}`}>{children}</div>
+            <div
+              className={`mx-auto ${isMobile ? "w-full px-4" : "w-full px-6"}`}
+            >
+              {children}
+            </div>
           </main>
         </div>
 

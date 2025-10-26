@@ -1,7 +1,7 @@
-import React from "react";
 import Image from "next/image";
-import { NAVIGATION } from "../../constants";
-import { sidebarStyles } from "../../styles/components";
+import React from "react";
+import { NAVIGATION } from "../../../constants";
+import { sidebarStyles } from "../../../styles/components";
 
 interface SidebarLogoProps {
   isCollapsed: boolean;

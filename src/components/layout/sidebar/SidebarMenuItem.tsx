@@ -1,8 +1,11 @@
+import { usePathname, useRouter } from "next/navigation";
 import React from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { MenuItem } from "../../types/components";
-import { MENU_LABELS } from "../../constants/navigation";
-import { getSidebarMenuItemClasses, sidebarMenuItemStyles } from "../../styles/components";
+import { MENU_LABELS } from "../../../constants/navigation";
+import {
+  getSidebarMenuItemClasses,
+  sidebarMenuItemStyles,
+} from "../../../styles/components";
+import { MenuItem } from "../../../types/components";
 import MoreDropdown from "./MoreDropdown";
 
 interface SidebarMenuItemProps {
@@ -11,7 +14,11 @@ interface SidebarMenuItemProps {
   onNavigate?: (href: string) => void;
 }
 
-const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({ item, isCollapsed, onNavigate }) => {
+const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
+  item,
+  isCollapsed,
+  onNavigate,
+}) => {
   const router = useRouter();
   const pathname = usePathname();
   const IconComponent = item.icon;
@@ -23,7 +30,7 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({ item, isCollapsed, on
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     // 현재 페이지와 같은 경로면 이동하지 않음
     if (pathname === item.href) {
       return;
@@ -46,9 +53,7 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({ item, isCollapsed, on
         <IconComponent className={sidebarMenuItemStyles.icon.size} />
       </div>
       {!isCollapsed && (
-        <span className={sidebarMenuItemStyles.label}>
-          {item.label}
-        </span>
+        <span className={sidebarMenuItemStyles.label}>{item.label}</span>
       )}
     </button>
   );

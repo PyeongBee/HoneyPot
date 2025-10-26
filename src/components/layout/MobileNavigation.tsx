@@ -3,11 +3,18 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { LONG_PRESS_DURATION, TOOLTIP_DISPLAY_DURATION } from "../constants/editor";
-import { MENU_ITEMS, MENU_LABELS } from "../constants/navigation";
-import { useConfirmStore } from "../stores/confirmStore";
-import { cn, getMobileNavButtonClasses, mobileNavStyles } from "../styles/components";
-import MoreMenuDropdown from "./common/MoreMenuDropdown";
+import {
+  LONG_PRESS_DURATION,
+  TOOLTIP_DISPLAY_DURATION,
+} from "../../constants/editor";
+import { MENU_ITEMS, MENU_LABELS } from "../../constants/navigation";
+import { useConfirmStore } from "../../stores/confirmStore";
+import {
+  cn,
+  getMobileNavButtonClasses,
+  mobileNavStyles,
+} from "../../styles/components";
+import MoreMenuDropdown from "../common/MoreMenuDropdown";
 
 export default function MobileNavigation() {
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
@@ -18,7 +25,7 @@ export default function MobileNavigation() {
   const router = useRouter();
   const pathname = usePathname();
   const { showConfirm } = useConfirmStore();
-  
+
   // 통합된 메뉴 소스에서 가져오기
   const menuItems = MENU_ITEMS;
 
@@ -49,20 +56,22 @@ export default function MobileNavigation() {
   };
 
   const handleNavigation = (href: string) => {
-    if (pathname === '/editor') {
+    if (pathname === "/editor") {
       // 에디터 페이지에서 나갈 때 확인
-      const editorContent = sessionStorage.getItem('editorContent');
-      const hasRealContent = editorContent && 
-                            editorContent.trim() && 
-                            editorContent.trim().length > 0;
-      
+      const editorContent = sessionStorage.getItem("editorContent");
+      const hasRealContent =
+        editorContent &&
+        editorContent.trim() &&
+        editorContent.trim().length > 0;
+
       if (hasRealContent) {
         showConfirm({
-          message: "입력한 내용이 있습니다. 정말 나가시겠습니까?\n저장되지 않은 내용은 사라집니다.",
+          message:
+            "입력한 내용이 있습니다. 정말 나가시겠습니까?\n저장되지 않은 내용은 사라집니다.",
           confirmText: "나가기",
           variant: "destructive",
           onConfirm: () => {
-            sessionStorage.removeItem('editorContent');
+            sessionStorage.removeItem("editorContent");
             router.push(href);
           },
         });
@@ -84,7 +93,7 @@ export default function MobileNavigation() {
         {menuItems.map((item, index) => {
           const IconComponent = item.icon;
           const isMoreMenu = item.label === MENU_LABELS.MORE_MENU;
-          
+
           return (
             <div key={index} className="relative">
               {isMoreMenu ? (
@@ -112,7 +121,7 @@ export default function MobileNavigation() {
               ) : (
                 <Link
                   href={item.href}
-                  onClick={(e) => {
+                  onClick={e => {
                     e.preventDefault();
                     handleNavigation(item.href);
                   }}
