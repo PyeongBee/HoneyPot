@@ -1,5 +1,5 @@
+import { getButtonClasses, type ButtonSize, type ButtonVariant } from "@/styles/components";
 import React from "react";
-import { getButtonClasses, type ButtonVariant, type ButtonSize } from "@/styles/components";
 
 interface ButtonProps {
   variant?: ButtonVariant;

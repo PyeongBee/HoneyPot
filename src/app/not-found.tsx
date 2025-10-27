@@ -1,9 +1,8 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import { ArrowLeft, Home } from 'lucide-react';
 import Image from 'next/image';
-import { Home, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import { NAVIGATION } from '../constants';
 
 export default function NotFound() {

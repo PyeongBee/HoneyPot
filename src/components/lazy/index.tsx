@@ -2,9 +2,7 @@
  * 지연 로딩 컴포넌트들
  */
 
-import dynamic from 'next/dynamic';
-import { ComponentType } from 'react';
-import { SpellCheckSidebarProps } from '../../types';
+import dynamic from "next/dynamic";
 
 // 로딩 컴포넌트
 const LoadingSpinner = () => (
@@ -15,7 +13,7 @@ const LoadingSpinner = () => (
 
 // 에디터 컴포넌트들을 동적 import
 export const LazyEditor = dynamic(
-  () => import('../editor/Editor'),
+  () => import("../../app/(pages)/editor/_components/Editor"),
   {
     loading: LoadingSpinner,
     ssr: false,
@@ -23,15 +21,31 @@ export const LazyEditor = dynamic(
 );
 
 export const LazySpellCheckSidebar = dynamic(
-  () => import('../editor/SpellCheckSidebar'),
+  () => import("../../app/(pages)/editor/_components/SpellCheckSidebar"),
   {
     loading: LoadingSpinner,
     ssr: false,
   }
-) as ComponentType<SpellCheckSidebarProps>;
+);
+
+export const LazyQualityCheckSidebar = dynamic(
+  () => import("../../app/(pages)/editor/_components/QualityCheckSidebar"),
+  {
+    loading: LoadingSpinner,
+    ssr: false,
+  }
+);
+
+export const LazyQualityHighlightedText = dynamic(
+  () => import("../../app/(pages)/editor/_components/QualityHighlightedText"),
+  {
+    loading: LoadingSpinner,
+    ssr: false,
+  }
+);
 
 export const LazyDiffViewer = dynamic(
-  () => import('../editor/DiffViewer'),
+  () => import("../../app/(pages)/editor/_components/DiffViewer"),
   {
     loading: LoadingSpinner,
     ssr: false,
@@ -39,7 +53,7 @@ export const LazyDiffViewer = dynamic(
 );
 
 export const LazyOriginalEditor = dynamic(
-  () => import('../editor/OriginalEditor'),
+  () => import("../../app/(pages)/editor/_components/OriginalEditor"),
   {
     loading: LoadingSpinner,
     ssr: false,

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { Memo } from "../types/editor";
 
 interface UseMemoHighlightProps {
@@ -7,18 +7,36 @@ interface UseMemoHighlightProps {
   highlightedRange: { start: number; end: number } | null;
 }
 
+interface HighlightRange {
+  start: number;
+  end: number;
+  isCurrent: boolean;
+}
+
+interface CharHighlightState {
+  isCurrent: boolean;
+  isHighlighted: boolean;
+}
+
+/**
+ * 메모 하이라이트를 관리하는 커스텀 훅
+ * 텍스트에 메모 영역을 시각적으로 표시하고, 선택된 메모를 강조 표시합니다.
+ */
 export const useMemoHighlight = ({
   memos,
   highlightedMemo,
   highlightedRange,
 }: UseMemoHighlightProps) => {
-  const applyHighlight = useCallback(
-    (text: string, startIndex: number, endIndex: number) => {
-      const highlights: Array<{
-        start: number;
-        end: number;
-        isCurrent: boolean;
-      }> = [];
+  /**
+   * 하이라이트 범위를 수집합니다.
+   * @param text - 하이라이트를 적용할 텍스트
+   * @param startIndex - 텍스트 세그먼트의 시작 인덱스
+   * @param endIndex - 텍스트 세그먼트의 끝 인덱스
+   * @returns 하이라이트 범위 배열
+   */
+  const collectHighlightRanges = useCallback(
+    (text: string, startIndex: number, endIndex: number): HighlightRange[] => {
+      const highlights: HighlightRange[] = [];
 
       // 현재 선택된 범위 추가
       if (
@@ -54,67 +72,105 @@ export const useMemoHighlight = ({
         }
       });
 
-      // 하이라이트가 없으면 원본 텍스트 반환
+      return highlights.sort((a, b) => a.start - b.start);
+    },
+    [memos, highlightedMemo, highlightedRange]
+  );
+
+  /**
+   * 하이라이트 범위를 문자 단위 상태 배열로 변환합니다.
+   * 중복되는 하이라이트를 올바르게 처리하기 위해 각 문자마다 상태를 관리합니다.
+   */
+  const createCharHighlightMap = useCallback(
+    (textLength: number, highlights: HighlightRange[]): CharHighlightState[] => {
+      const charHighlights: CharHighlightState[] = new Array(textLength)
+        .fill(null)
+        .map(() => ({ isCurrent: false, isHighlighted: false }));
+
+      highlights.forEach((highlight) => {
+        for (let i = highlight.start; i < highlight.end && i < textLength; i++) {
+          charHighlights[i].isHighlighted = true;
+          if (highlight.isCurrent) {
+            charHighlights[i].isCurrent = true;
+          }
+        }
+      });
+
+      return charHighlights;
+    },
+    []
+  );
+
+  /**
+   * 텍스트에 하이라이트를 적용하여 JSX 요소로 반환합니다.
+   * @param text - 하이라이트를 적용할 텍스트
+   * @param startIndex - 전체 텍스트에서의 시작 인덱스
+   * @param endIndex - 전체 텍스트에서의 끝 인덱스
+   * @returns 하이라이트가 적용된 JSX 요소
+   */
+  const applyHighlight = useCallback(
+    (text: string, startIndex: number, endIndex: number) => {
+      const highlights = collectHighlightRanges(text, startIndex, endIndex);
+
       if (highlights.length === 0) {
         return text;
       }
 
-      // 하이라이트들을 정렬하고 겹치는 부분 병합
-      highlights.sort((a, b) => a.start - b.start);
-      const mergedHighlights = [];
-      let current = highlights[0];
+      const charHighlights = createCharHighlightMap(text.length, highlights);
+      const result: React.ReactElement[] = [];
+      let i = 0;
 
-      for (let i = 1; i < highlights.length; i++) {
-        if (highlights[i].start <= current.end) {
-          // 겹치는 경우 병합
-          current = {
-            start: current.start,
-            end: Math.max(current.end, highlights[i].end),
-            isCurrent: current.isCurrent || highlights[i].isCurrent,
-          };
+      // 연속된 같은 상태의 문자들을 그룹화하여 렌더링
+      while (i < text.length) {
+        const currentState = charHighlights[i];
+        let j = i;
+
+        // 같은 상태를 가진 연속된 문자들을 찾음
+        while (
+          j < text.length &&
+          charHighlights[j].isHighlighted === currentState.isHighlighted &&
+          charHighlights[j].isCurrent === currentState.isCurrent
+        ) {
+          j++;
+        }
+
+        const segment = text.substring(i, j);
+        const segmentStartIndex = startIndex + i;
+        const segmentEndIndex = startIndex + j;
+
+        if (currentState.isHighlighted) {
+          result.push(
+            <span
+              key={`highlight-${segmentStartIndex}-${segmentEndIndex}`}
+              className={`px-1 rounded ${
+                currentState.isCurrent
+                  ? "bg-yellow-400 dark:bg-yellow-500/90"
+                  : "bg-yellow-200 dark:bg-yellow-800/50"
+              }`}
+              data-start-index={segmentStartIndex}
+              data-end-index={segmentEndIndex}
+            >
+              {segment}
+            </span>
+          );
         } else {
-          mergedHighlights.push(current);
-          current = highlights[i];
-        }
-      }
-      mergedHighlights.push(current);
-
-      // 텍스트를 하이라이트와 함께 렌더링
-      const result = [];
-      let lastIndex = 0;
-
-      mergedHighlights.forEach((highlight, index) => {
-        // 하이라이트 이전 텍스트
-        if (highlight.start > lastIndex) {
-          result.push(text.substring(lastIndex, highlight.start));
+          result.push(
+            <span
+              key={`text-${segmentStartIndex}-${segmentEndIndex}`}
+              data-start-index={segmentStartIndex}
+              data-end-index={segmentEndIndex}
+            >
+              {segment}
+            </span>
+          );
         }
 
-        // 하이라이트된 텍스트
-        const highlightText = text.substring(highlight.start, highlight.end);
-        result.push(
-          <span
-            key={`highlight-${index}`}
-            className={`px-1 rounded ${
-              highlight.isCurrent
-                ? "bg-yellow-400 dark:bg-yellow-500/90" // 하이라이트된 메모는 더 진한 노란색
-                : "bg-yellow-200 dark:bg-yellow-800/50" // 일반 메모는 연한 노란색
-            }`}
-          >
-            {highlightText}
-          </span>
-        );
-
-        lastIndex = highlight.end;
-      });
-
-      // 마지막 하이라이트 이후 텍스트
-      if (lastIndex < text.length) {
-        result.push(text.substring(lastIndex));
+        i = j;
       }
 
-      return result.length > 1 ? <>{result}</> : text;
+      return <>{result}</>;
     },
-    [memos, highlightedMemo, highlightedRange]
+    [collectHighlightRanges, createCharHighlightMap]
   );
 
   return { applyHighlight };

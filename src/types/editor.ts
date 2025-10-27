@@ -53,15 +53,10 @@ export interface CharacterCountProps {
   characterCount: number;
   wordCount: number;
   lineCount: number;
-  charLimit: number;
   isOverLimit: boolean;
 }
 
 export interface CopyResult {
   success: boolean;
   message: string;
-}
-
-export interface SpellCheckSidebarProps {
-  onApplyCorrections: () => void;
 }

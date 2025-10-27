@@ -30,4 +30,24 @@ export const MESSAGES = {
     EDITOR_ARIA: '자소서 수정 입력',
     CLOSE_TOAST: '토스트 닫기',
   },
+  CONFIRM: {
+    LEAVE_PAGE: {
+      TITLE: '페이지를 나가시겠습니까?',
+      MESSAGE: '입력한 내용이 있습니다. 정말 나가시겠습니까?\n저장되지 않은 내용은 사라집니다.',
+      CONFIRM: '나가기',
+      CANCEL: '취소',
+    },
+    DELETE_ALL: {
+      TITLE: '모든 공유 기록 삭제',
+      MESSAGE: '모든 공유 기록을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.',
+      CONFIRM: '삭제',
+      CANCEL: '취소',
+    },
+    MODE_CHANGE: {
+      TITLE: '수정 모드로 전환',
+      MESSAGE: '수정 모드로 전환하면 기존 메모 데이터가 모두 삭제됩니다.\n계속하시겠습니까?',
+      CONFIRM: '계속',
+      CANCEL: '취소',
+    },
+  },
 } as const;
