@@ -7,7 +7,7 @@ import { useQualityCheckStore } from "../../../../stores/qualityCheckStore";
 import { QualityIssueType } from "../../../../types/qualityCheck";
 import { filterRemovableIssues } from "../../../../utils/correctionUtils";
 import CheckItem from "./CheckItem";
-import CheckSidebarLayout from "./CheckSidebarLayout";
+import CheckSidebarLayout from "./layout/CheckSidebarLayout";
 
 const ISSUE_TYPE_LABELS: Record<QualityIssueType, string> = {
   sentence_length: "문장 길이",

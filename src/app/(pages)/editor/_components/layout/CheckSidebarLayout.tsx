@@ -1,7 +1,3 @@
-/**
- * 맞춤법/품질 검사 사이드바의 공통 레이아웃 컴포넌트
- */
-
 "use client";
 
 import { CheckCircle2, Loader2 } from "lucide-react";

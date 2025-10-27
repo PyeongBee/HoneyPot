@@ -14,12 +14,16 @@ import { useTextCorrections } from "@/hooks/useTextCorrections";
 import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 import { useConfirmStore } from "@/stores/confirmStore";
 import { useDeviceStore } from "@/stores/deviceStore";
+import { useSidebarStore } from "@/stores/sidebarStore";
 import { useSpellCheckStore } from "@/stores/spellCheckStore";
 import { ToastData, useToastStore } from "@/stores/toastStore";
 import { getTextStats } from "@/utils/textUtils";
 import { useCallback, useEffect, useState } from "react";
-import EditorModeSelector from "../../(pages)/editor/_components/EditorModeSelector";
-import EditorSidebar from "../../(pages)/editor/_components/EditorSidebar";
+import EditorSidebar from "./_components/layout/EditorSidebar";
+import EditorUpperHeader from "./_components/layout/EditorUpperHeader";
+import QuestionEditor from "./_components/QuestionEditor";
+import ShareButton from "./_components/ShareButton";
+import ShareModal from "./_components/ShareModal";
 
 export const dynamic = "force-dynamic";
 
@@ -28,8 +32,8 @@ export default function EditorPage() {
   const { isSpellCheckMode } = useSpellCheckStore();
   const { toasts, showSuccess, showError, removeToast } = useToastStore();
   const { showConfirm } = useConfirmStore();
+  const { isCollapsed } = useSidebarStore();
 
-  // 에디터 상태
   const {
     originalText,
     editedText,
@@ -49,10 +53,7 @@ export default function EditorPage() {
     resetTexts,
   } = useEditorState();
 
-  const { shareUrl, isCopied, handleShare, handleCopyUrl } = useShareFeature(
-    showSuccess,
-    showError
-  );
+  const { createShare, copyShareUrl } = useShareFeature(showSuccess, showError);
 
   const { applySpellCorrections, applyQualityCorrections } = useTextCorrections(
     {
@@ -71,6 +72,7 @@ export default function EditorPage() {
   // UI 상태
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
   const [lastScrollY, setLastScrollY] = useState<number>(0);
+  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
 
   // 변경사항 감지
   useUnsavedChanges({ hasUnsavedChanges: !!(originalText || editedText) });
@@ -104,32 +106,25 @@ export default function EditorPage() {
   // 모드 변경 핸들러
   const handleModeChange = useCallback(
     (mode: typeof viewMode) => {
-      if (mode === "edit" && !originalText) {
-        showError("원본 텍스트를 먼저 입력해주세요.");
-        return;
-      }
-
-      if (mode === "result" && !originalText && !editedText) {
-        showError("원본 또는 수정된 텍스트를 먼저 입력해주세요.");
-        return;
-      }
-
       setViewMode(mode);
     },
     [originalText, editedText, showError, setViewMode]
   );
 
-  // 초기화 핸들러
-  const handleReset = useCallback(() => {
-    showConfirm({
-      message: "모든 내용을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
-      onConfirm: () => {
-        resetTexts();
-        setViewMode("original");
-        showSuccess("모든 내용이 초기화되었습니다.");
-      },
-    });
-  }, [showConfirm, resetTexts, setViewMode, showSuccess]);
+  const handleQuestionLimitChange = (limit: number) => {
+    setQuestionCharLimit(limit);
+  };
+
+  // 문항 변경 핸들러
+  const handleQuestionChange = (text: string) => {
+    setQuestionText(text);
+    const totalContent = originalText + editedText + text;
+    if (totalContent.trim()) {
+      sessionStorage.setItem("editorContent", totalContent);
+    } else {
+      sessionStorage.removeItem("editorContent");
+    }
+  };
 
   // 메모 핸들러
   const handleMemoClick = useCallback((memo: (typeof memos)[0]) => {
@@ -155,23 +150,17 @@ export default function EditorPage() {
   }, [applyQualityCorrections]);
 
   // 공유 핸들러
-  const handleShareClick = useCallback(() => {
-    handleShare({
-      original: originalText,
-      edited: editedText,
-      question: questionText,
-      questionLimit: questionCharLimit,
-      memos,
-      timestamp: new Date().toISOString(),
-    });
-  }, [
-    handleShare,
-    originalText,
-    editedText,
-    questionText,
-    questionCharLimit,
-    memos,
-  ]);
+  const handleShareButtonClick = useCallback(() => {
+    if (!originalText && !editedText) {
+      showError("공유할 내용이 없습니다.");
+      return;
+    }
+    setIsShareModalOpen(true);
+  }, [originalText, editedText, showError]);
+
+  const handleCloseShareModal = useCallback(() => {
+    setIsShareModalOpen(false);
+  }, []);
 
   // 통계 계산
   const originalStats = getTextStats(originalText, questionCharLimit);
@@ -206,20 +195,25 @@ export default function EditorPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 md:pb-0">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* 모드 선택 */}
-        <div className="mb-6">
-          <EditorModeSelector
-            viewMode={viewMode}
-            isMobile={isMobile}
-            onModeChange={handleModeChange}
-          />
-        </div>
+      <EditorUpperHeader
+        viewMode={viewMode}
+        isMobile={isMobile}
+        isCollapsed={isCollapsed}
+        isHeaderVisible={isHeaderVisible}
+        onModeChange={handleModeChange}
+      />
 
-        {/* 메인 콘텐츠 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* 에디터 영역 */}
-          <div className="md:col-span-2">
+      <QuestionEditor
+        viewMode={viewMode}
+        questionText={questionText}
+        questionCharLimit={questionCharLimit}
+        onQuestionChange={handleQuestionChange}
+        onQuestionLimitChange={handleQuestionLimitChange}
+      />
+
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-3">
+          <div className="md:col-span-3">
             {viewMode === "original" && (
               <LazyOriginalEditor
                 originalText={originalText}
@@ -247,36 +241,38 @@ export default function EditorPage() {
             )}
           </div>
 
-          {/* 사이드바 영역 */}
-          <div>
+          <div className="md:col-span-1">
             <EditorSidebar
               viewMode={viewMode}
-              isSpellCheckMode={isSpellCheckMode}
-              isQualityCheckActive={isQualityCheckActive}
-              originalText={originalText}
-              editedText={editedText}
-              questionText={questionText}
-              questionCharLimit={questionCharLimit}
               memos={memos}
-              isCopied={isCopied}
-              shareUrl={shareUrl}
               originalStats={originalStats}
               editedStats={editedStats}
-              onQuestionTextChange={setQuestionText}
-              onQuestionCharLimitChange={setQuestionCharLimit}
-              onAddMemo={addMemo}
               onDeleteMemo={deleteMemo}
               onMemoClick={handleMemoClick}
               onMemoHover={handleMemoHover}
-              onShare={handleShareClick}
-              onCopyUrl={handleCopyUrl}
               renderCheckSidebar={renderSidebar()}
             />
           </div>
         </div>
       </div>
 
-      {/* 토스트 알림 */}
+      <ShareButton isMobile={isMobile} onClick={handleShareButtonClick} />
+
+      <ShareModal
+        isOpen={isShareModalOpen}
+        shareData={{
+          original: originalText,
+          edited: editedText,
+          question: questionText,
+          questionLimit: questionCharLimit,
+          memos,
+          timestamp: new Date().toISOString(),
+        }}
+        onClose={handleCloseShareModal}
+        onShare={createShare}
+        onCopy={copyShareUrl}
+      />
+
       {toasts.map((toast: ToastData) => (
         <Toast
           key={toast.id}

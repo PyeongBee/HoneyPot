@@ -53,7 +53,6 @@ export interface CharacterCountProps {
   characterCount: number;
   wordCount: number;
   lineCount: number;
-  charLimit: number;
   isOverLimit: boolean;
 }
 

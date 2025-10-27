@@ -1,9 +1,4 @@
-/**
- * 공유 기능 훅
- */
-
-import { useCallback, useState } from "react";
-import { COPY_SUCCESS_DURATION } from "../constants/editor";
+import { useCallback } from "react";
 import { ShareData } from "../types/editor";
 import {
   copyToClipboard,
@@ -16,56 +11,38 @@ export function useShareFeature(
   showSuccess: (message: string) => void,
   showError: (message: string) => void
 ) {
-  const [shareUrl, setShareUrl] = useState<string>("");
-  const [isCopied, setIsCopied] = useState<boolean>(false);
+  // 링크 생성 (복사는 하지 않음)
+  const createShare = useCallback((shareData: ShareData): string => {
+    if (!shareData.original && !shareData.edited) {
+      throw new Error("공유할 내용이 없습니다.");
+    }
 
-  const handleShare = useCallback(
-    (shareData: ShareData) => {
-      if (!shareData.original && !shareData.edited) {
-        showError("공유할 내용이 없습니다.");
-        return;
-      }
+    const url = createShareUrl(shareData);
+    const shareId = generateShareId();
 
+    saveShareHistory(shareData, url);
+
+    return url;
+  }, []);
+
+  // 링크 복사
+  const copyShareUrl = useCallback(
+    async (url: string): Promise<boolean> => {
       try {
-        const url = createShareUrl(shareData);
-        const shareId = generateShareId();
-        const title = shareData.question || "제목 없음";
-
-        saveShareHistory(shareData, url);
-
-        setShareUrl(url);
-
-        copyToClipboard(url);
-        setIsCopied(true);
-        showSuccess("공유 링크가 클립보드에 복사되었습니다!");
-
-        setTimeout(() => {
-          setIsCopied(false);
-        }, COPY_SUCCESS_DURATION);
+        await copyToClipboard(url);
+        showSuccess("링크가 클립보드에 복사되었습니다!");
+        return true;
       } catch (error) {
-        console.error("공유 실패:", error);
-        showError("공유 링크 생성에 실패했습니다.");
+        console.error("복사 실패:", error);
+        showError("링크 복사에 실패했습니다.");
+        return false;
       }
     },
     [showSuccess, showError]
   );
 
-  const handleCopyUrl = useCallback(() => {
-    if (shareUrl) {
-      copyToClipboard(shareUrl);
-      setIsCopied(true);
-      showSuccess("링크가 클립보드에 복사되었습니다!");
-
-      setTimeout(() => {
-        setIsCopied(false);
-      }, COPY_SUCCESS_DURATION);
-    }
-  }, [shareUrl, showSuccess]);
-
   return {
-    shareUrl,
-    isCopied,
-    handleShare,
-    handleCopyUrl,
+    createShare,
+    copyShareUrl,
   };
 }
