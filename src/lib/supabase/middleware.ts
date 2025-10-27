@@ -39,7 +39,8 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // 인증이 필요한 페이지 보호
-  const protectedPaths = ["/editor", "/activity"];
+  // editor는 로그인 없이도 접근 가능 (게스트 모드)
+  const protectedPaths = ["/logout"];
   const isProtectedPath = protectedPaths.some(path =>
     request.nextUrl.pathname.startsWith(path)
   );
