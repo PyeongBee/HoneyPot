@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { MOBILE_BREAKPOINT } from "../../constants/editor";
 import { useConfirmStore } from "../../stores/confirmStore";
 import { useSidebarStore } from "../../stores/sidebarStore";
+import AuthProvider from "../auth/AuthProvider";
 import ConfirmDialog from "../common/ConfirmDialog";
 import MobileNavigation from "./MobileNavigation";
 import Sidebar from "./Sidebar";
@@ -63,7 +64,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   }, []);
 
   return (
-    <>
+    <AuthProvider>
       <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
         {/* 데스크톱 사이드바 - 클라이언트에서만 표시 */}
         {!isMobile && isClient && (
@@ -99,6 +100,6 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
       {/* 컨펌 다이얼로그 */}
       <ConfirmDialog />
-    </>
+    </AuthProvider>
   );
 }
