@@ -6,6 +6,7 @@ import React from "react";
 import SidebarLogo from "./sidebar/SidebarLogo";
 import SidebarMenuItem from "./sidebar/SidebarMenuItem";
 import SidebarToggle from "./sidebar/SidebarToggle";
+import UserProfile from "./sidebar/UserProfile";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -36,6 +37,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           />
         ))}
       </nav>
+
+      <UserProfile isCollapsed={isCollapsed} />
 
       <SidebarToggle isCollapsed={isCollapsed} onToggle={onToggle} />
     </div>
