@@ -7,6 +7,7 @@
 import React, { useCallback } from "react";
 import { MESSAGES } from "../../../../constants";
 import { useQualityCheck } from "../../../../hooks/useQualityCheck";
+import { useResizable } from "../../../../hooks/useResizable";
 import { useSpellCheck } from "../../../../hooks/useSpellCheck";
 import { useQualityCheckStore } from "../../../../stores/qualityCheckStore";
 import { useToastStore } from "../../../../stores/toastStore";
@@ -38,6 +39,13 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
   const { result: qualityResult, clearResult: clearQualityResult } =
     useQualityCheckStore();
 
+  const { height, isResizing, handleMouseDown } = useResizable({
+    minHeight: 200,
+    maxHeight: 800,
+    defaultHeight: 512,
+    storageKey: "editor-edited-height",
+  });
+
   const isQualityCheckMode = !!qualityResult;
   const isTextEmpty = !editedText.trim();
 
@@ -63,7 +71,10 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
   const renderEditorContent = () => {
     if (isSpellCheckMode) {
       return (
-        <div className="w-full h-128 px-4 pt-4 pb-0 overflow-y-auto">
+        <div
+          className="w-full px-4 pt-4 pb-0 overflow-y-auto"
+          style={{ height: `${height}px` }}
+        >
           <HighlightedText
             text={editedText}
             className="whitespace-pre-wrap text-gray-900 dark:text-white leading-relaxed"
@@ -74,7 +85,10 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
 
     if (isQualityCheckMode) {
       return (
-        <div className="w-full h-128 px-4 pt-4 pb-0 overflow-y-auto">
+        <div
+          className="w-full px-4 pt-4 pb-0 overflow-y-auto"
+          style={{ height: `${height}px` }}
+        >
           <QualityHighlightedText
             text={editedText}
             className="whitespace-pre-wrap text-gray-900 dark:text-white leading-relaxed"
@@ -86,11 +100,12 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
     return (
       <textarea
         className={cn(
-          "w-full h-128 px-4 pt-4 pb-0 border-0 resize-none",
+          "w-full px-4 pt-4 pb-0 border-0 resize-none",
           "focus:outline-none focus:ring-0 bg-transparent",
           "text-gray-900 dark:text-white",
           "placeholder-gray-500 dark:placeholder-gray-400"
         )}
+        style={{ height: `${height}px` }}
         value={editedText}
         onChange={e => onEditedChange(e.target.value)}
         placeholder={MESSAGES.LABELS.EDIT_PLACEHOLDER}
@@ -122,6 +137,19 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
             </div>
           </div>
           {renderEditorContent()}
+          {/* 크기 조정 핸들 */}
+          <div
+            className={`
+              h-2 cursor-ns-resize flex items-center justify-center
+              hover:bg-blue-500 hover:bg-opacity-20 transition-colors
+              border-t border-gray-200 dark:border-gray-700
+              ${isResizing ? "bg-blue-500 bg-opacity-30" : ""}
+            `}
+            onMouseDown={handleMouseDown}
+            title="드래그하여 크기 조정"
+          >
+            <div className="w-12 h-1 rounded-full bg-gray-400 dark:bg-gray-500" />
+          </div>
         </div>
       </div>
     </>

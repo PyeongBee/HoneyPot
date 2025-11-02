@@ -1,4 +1,5 @@
 import { MESSAGES } from "@/constants/messages";
+import { useResizable } from "@/hooks/useResizable";
 import React from "react";
 
 interface OriginalEditorProps {
@@ -8,6 +9,12 @@ interface OriginalEditorProps {
 
 const OriginalEditor: React.FC<OriginalEditorProps> = React.memo(
   function OriginalEditor({ originalText, onOriginalChange }) {
+    const { height, isResizing, handleMouseDown } = useResizable({
+      minHeight: 200,
+      maxHeight: 800,
+      defaultHeight: 512,
+      storageKey: "editor-original-height",
+    });
 
     return (
       <div className="w-full h-full">
@@ -18,13 +25,27 @@ const OriginalEditor: React.FC<OriginalEditorProps> = React.memo(
             </label>
           </div>
           <textarea
-            className="w-full h-128 p-4 border-0 resize-none focus:outline-none focus:ring-0 
+            className="w-full p-4 border-0 resize-none focus:outline-none focus:ring-0 
                    bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+            style={{ height: `${height}px` }}
             value={originalText}
-            onChange={(e) => onOriginalChange(e.target.value)}
+            onChange={e => onOriginalChange(e.target.value)}
             placeholder={MESSAGES.LABELS.ORIGINAL_PLACEHOLDER}
             aria-label={MESSAGES.LABELS.ORIGINAL_ARIA}
           />
+          {/* 크기 조정 핸들 */}
+          <div
+            className={`
+              h-2 cursor-ns-resize flex items-center justify-center
+              hover:bg-blue-500 hover:bg-opacity-20 transition-colors
+              border-t border-gray-200 dark:border-gray-700
+              ${isResizing ? "bg-blue-500 bg-opacity-30" : ""}
+            `}
+            onMouseDown={handleMouseDown}
+            title="드래그하여 크기 조정"
+          >
+            <div className="w-12 h-1 rounded-full bg-gray-400 dark:bg-gray-500" />
+          </div>
         </div>
       </div>
     );

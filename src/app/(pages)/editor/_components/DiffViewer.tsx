@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useMemoHighlight } from "../../../../hooks/useMemoHighlight";
+import { useResizable } from "../../../../hooks/useResizable";
 import { useTextSelection } from "../../../../hooks/useTextSelection";
 import { Memo } from "../../../../types/editor";
 import DiffTextRenderer from "./DiffTextRenderer";
@@ -22,6 +23,13 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(function DiffViewer({
   highlightedMemo,
 }) {
   const [viewMode, setViewMode] = useState<"diff" | "final">("diff");
+
+  const { height, isResizing, handleMouseDown } = useResizable({
+    minHeight: 200,
+    maxHeight: 800,
+    defaultHeight: 512,
+    storageKey: "editor-diffviewer-height",
+  });
 
   const isFinalMode = viewMode === "final";
 
@@ -108,12 +116,26 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(function DiffViewer({
         <div>
           <div
             ref={textRef}
-            className="h-128 p-4 mb-1.5 overflow-y-auto text-gray-900 dark:text-white whitespace-pre-wrap"
+            className="p-4 mb-1.5 overflow-y-auto text-gray-900 dark:text-white whitespace-pre-wrap"
+            style={{ height: `${height}px` }}
             role="textbox"
             aria-label={viewMode === "diff" ? "변경사항" : "최종 결과"}
           >
             {renderContent()}
           </div>
+        </div>
+        {/* 크기 조정 핸들 */}
+        <div
+          className={`
+            h-2 cursor-ns-resize flex items-center justify-center
+            hover:bg-blue-500 hover:bg-opacity-20 transition-colors
+            border-t border-gray-200 dark:border-gray-700
+            ${isResizing ? "bg-blue-500 bg-opacity-30" : ""}
+          `}
+          onMouseDown={handleMouseDown}
+          title="드래그하여 크기 조정"
+        >
+          <div className="w-12 h-1 rounded-full bg-gray-400 dark:bg-gray-500" />
         </div>
       </div>
 
