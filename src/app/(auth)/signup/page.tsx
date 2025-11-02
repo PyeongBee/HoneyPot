@@ -3,17 +3,9 @@
 import { Button } from "@/components/common/Button";
 import { InputField, InputLabel } from "@/components/common/Input";
 import { useAuth } from "@/hooks/useAuth";
-import { signInWithMagicLink, signUp } from "@/lib/actions/auth";
+import { signUp } from "@/lib/actions/auth";
 import { useToastStore } from "@/stores/toastStore";
-import {
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-  Lock,
-  Mail,
-  Sparkles,
-  User,
-} from "lucide-react";
+import { Loader2, Lock, Mail, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,13 +16,11 @@ export default function SignUpPage() {
   const { signInWithOAuth } = useAuth();
   const { showError, showSuccess } = useToastStore();
 
-  // 매직 링크 상태
-  const [magicEmail, setMagicEmail] = useState("");
-  const [magicPending, startMagicTransition] = useTransition();
+  // 이메일 발송 완료 상태
   const [emailSent, setEmailSent] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   // 비밀번호 회원가입 상태
-  const [showPasswordSignup, setShowPasswordSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -39,27 +29,6 @@ export default function SignUpPage() {
 
   // OAuth 상태
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
-
-  // 매직 링크로 가입
-  const handleMagicLink = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!magicEmail) {
-      showError("이메일을 입력해주세요.");
-      return;
-    }
-
-    startMagicTransition(async () => {
-      const result = await signInWithMagicLink(magicEmail);
-
-      if (result.success) {
-        setEmailSent(true);
-        showSuccess("✨ 매직 링크를 이메일로 전송했습니다!");
-      } else {
-        showError(result.error?.message || "전송에 실패했습니다.");
-      }
-    });
-  };
 
   // 비밀번호로 회원가입
   const handlePasswordSignup = async (e: React.FormEvent) => {
@@ -85,8 +54,9 @@ export default function SignUpPage() {
       const result = await signUp({ email, password, fullName });
 
       if (result.success) {
+        setRegisteredEmail(email);
+        setEmailSent(true);
         showSuccess("회원가입 성공! 이메일을 확인해주세요.");
-        router.push("/login");
       } else {
         showError(result.error?.message || "회원가입에 실패했습니다.");
       }
@@ -120,23 +90,23 @@ export default function SignUpPage() {
           </div>
 
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
-            <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-green-600 dark:text-green-400" />
             </div>
 
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              이메일을 확인하세요 ✨
+              이메일을 확인하세요 📧
             </h2>
 
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              <strong>{magicEmail}</strong>로
+              <strong>{registeredEmail}</strong>로
               <br />
-              매직 링크를 보냈습니다.
+              인증 메일을 보냈습니다.
               <br />
               <br />
               이메일의 링크를 클릭하면
               <br />
-              자동으로 가입 및 로그인됩니다!
+              이메일 인증이 완료되고 로그인할 수 있습니다!
             </p>
 
             <div className="text-sm text-gray-500 dark:text-gray-400 space-y-2 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg">
@@ -145,12 +115,12 @@ export default function SignUpPage() {
             </div>
           </div>
 
-          <button
-            onClick={() => setEmailSent(false)}
-            className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+          <Link
+            href="/login"
+            className="inline-block text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
           >
-            다시 보내기
-          </button>
+            로그인 페이지로 이동
+          </Link>
         </div>
       </div>
     );
@@ -179,58 +149,96 @@ export default function SignUpPage() {
           </p>
         </div>
 
-        {/* 매직 링크 가입 (메인) */}
-        <form onSubmit={handleMagicLink} className="mt-8 space-y-6">
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 p-6 rounded-lg border-2 border-purple-200 dark:border-purple-800">
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                매직 링크로 간편하게
-              </h3>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <InputLabel htmlFor="magic-email">이메일</InputLabel>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <InputField
-                    id="magic-email"
-                    type="email"
-                    value={magicEmail}
-                    onChange={setMagicEmail}
-                    placeholder="your@email.com"
-                    className="pl-10"
-                    autoFocus
-                  />
+        {/* 비밀번호 회원가입 (메인) */}
+        <form onSubmit={handlePasswordSignup} className="mt-8 space-y-6">
+          <div className="space-y-4">
+            <div>
+              <InputLabel htmlFor="fullName">이름 (선택)</InputLabel>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-gray-400" />
                 </div>
+                <InputField
+                  id="fullName"
+                  type="text"
+                  value={fullName}
+                  onChange={setFullName}
+                  placeholder="홍길동"
+                  className="pl-10"
+                  autoFocus
+                />
               </div>
-
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full"
-                disabled={magicPending}
-              >
-                {magicPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    전송 중...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    매직 링크로 시작하기
-                  </>
-                )}
-              </Button>
             </div>
 
-            <p className="mt-3 text-xs text-gray-600 dark:text-gray-400 text-center">
-              비밀번호 설정 없이 이메일만으로 가입 • 클릭 한 번으로 완료
-            </p>
+            <div>
+              <InputLabel htmlFor="email">이메일</InputLabel>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
+                <InputField
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={setEmail}
+                  placeholder="your@email.com"
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            <div>
+              <InputLabel htmlFor="password">비밀번호</InputLabel>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <InputField
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={setPassword}
+                  placeholder="••••••••"
+                  className="pl-10"
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                최소 6자 이상
+              </p>
+            </div>
+
+            <div>
+              <InputLabel htmlFor="confirmPassword">비밀번호 확인</InputLabel>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <InputField
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={setConfirmPassword}
+                  placeholder="••••••••"
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full"
+              disabled={passwordPending}
+            >
+              {passwordPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  가입 중...
+                </>
+              ) : (
+                "회원가입"
+              )}
+            </Button>
           </div>
         </form>
 
@@ -302,120 +310,6 @@ export default function SignUpPage() {
             )}
             GitHub로 가입
           </button>
-        </div>
-
-        {/* 비밀번호로 회원가입 (접기 가능) */}
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg">
-          <button
-            type="button"
-            onClick={() => setShowPasswordSignup(!showPasswordSignup)}
-            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4" />
-              <span>비밀번호로 회원가입</span>
-            </div>
-            {showPasswordSignup ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
-          </button>
-
-          {showPasswordSignup && (
-            <form
-              onSubmit={handlePasswordSignup}
-              className="px-4 pb-4 space-y-4"
-            >
-              <div>
-                <InputLabel htmlFor="fullName">이름 (선택)</InputLabel>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <InputField
-                    id="fullName"
-                    type="text"
-                    value={fullName}
-                    onChange={setFullName}
-                    placeholder="홍길동"
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <InputLabel htmlFor="email">이메일</InputLabel>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <InputField
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={setEmail}
-                    placeholder="your@email.com"
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <InputLabel htmlFor="password">비밀번호</InputLabel>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <InputField
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={setPassword}
-                    placeholder="••••••••"
-                    className="pl-10"
-                  />
-                </div>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  최소 6자 이상
-                </p>
-              </div>
-
-              <div>
-                <InputLabel htmlFor="confirmPassword">비밀번호 확인</InputLabel>
-                <div className="mt-1 relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <InputField
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={setConfirmPassword}
-                    placeholder="••••••••"
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                variant="secondary"
-                size="lg"
-                className="w-full"
-                disabled={passwordPending}
-              >
-                {passwordPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    가입 중...
-                  </>
-                ) : (
-                  "회원가입"
-                )}
-              </Button>
-            </form>
-          )}
         </div>
 
         {/* 로그인 링크 */}
