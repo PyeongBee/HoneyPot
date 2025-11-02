@@ -1,15 +1,20 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
-import { MORE_MENU_ITEMS, AUTH_MENU_ITEMS, MENU_LABELS } from "../../constants/navigation";
-import { 
-  getDropdownClasses, 
-  getDropdownArrowClasses, 
-  getSidebarMenuItemClasses,
+import React, { useEffect, useRef, useState } from "react";
+import {
+  AUTH_MENU_ITEMS,
+  MENU_LABELS,
+  MORE_MENU_ITEMS,
+} from "../../constants/navigation";
+import { useAuthStore } from "../../stores/authStore";
+import {
+  cn,
   dropdownStyles,
+  getDropdownArrowClasses,
+  getDropdownClasses,
+  getSidebarMenuItemClasses,
   sidebarMenuItemStyles,
-  cn
 } from "../../styles/components";
 
 interface MoreMenuDropdownProps {
@@ -17,15 +22,15 @@ interface MoreMenuDropdownProps {
   position?: "top" | "bottom";
   align?: "left" | "center" | "right";
   className?: string;
-  
+
   // 버튼 스타일 설정 (사이드바용)
   isCollapsed?: boolean;
   showButton?: boolean;
-  
+
   // 이벤트 핸들러
   onNavigate?: (href: string) => void;
   onItemClick?: (href: string) => void;
-  
+
   // 외부에서 드롭다운 상태 제어
   isOpen?: boolean;
   onToggle?: (isOpen: boolean) => void;
@@ -44,22 +49,32 @@ const MoreMenuDropdown: React.FC<MoreMenuDropdownProps> = ({
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
+  // 실제 인증 상태 사용
+  const { isAuthenticated } = useAuthStore();
+
   // 외부에서 제어하는 경우 외부 상태 사용, 아니면 내부 상태 사용
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
   const setIsOpen = onToggle || setInternalIsOpen;
-  
-  // 임시로 로그인 상태를 false로 설정 (나중에 실제 인증 상태로 연결)
-  const isLoggedIn = false;
-  
+
   // 통합된 메뉴 소스 사용
   const menuItems = MORE_MENU_ITEMS;
-  const authItem = isLoggedIn ? AUTH_MENU_ITEMS.LOGOUT : AUTH_MENU_ITEMS.LOGIN;
+  const authItem = isAuthenticated
+    ? AUTH_MENU_ITEMS.LOGOUT
+    : AUTH_MENU_ITEMS.LOGIN;
+
+  // 인증 상태 변경 시 드롭다운 닫기 (로그인/로그아웃 시 메뉴 상태 초기화)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [isAuthenticated, setIsOpen]);
 
   // 외부 클릭 감지
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -72,7 +87,7 @@ const MoreMenuDropdown: React.FC<MoreMenuDropdownProps> = ({
 
   const handleItemClick = (href: string) => {
     setIsOpen(false);
-    
+
     if (onItemClick) {
       onItemClick(href);
     } else if (onNavigate) {
@@ -104,10 +119,10 @@ const MoreMenuDropdown: React.FC<MoreMenuDropdownProps> = ({
               {item.label}
             </button>
           ))}
-          
+
           {/* 구분선 */}
           <div className={dropdownStyles.divider} />
-          
+
           {/* 로그인/로그아웃 메뉴 */}
           <button
             onClick={() => handleItemClick(authItem.href)}
@@ -116,18 +131,18 @@ const MoreMenuDropdown: React.FC<MoreMenuDropdownProps> = ({
             <authItem.icon className="w-4 h-4 mr-3" />
             {authItem.label}
           </button>
-          
+
           {/* 화살표 */}
           <div className={arrowClasses}></div>
         </div>
       )}
-      
+
       {/* 더보기 버튼 (showButton이 true일 때만 표시) */}
       {showButton && (
         <button
           onClick={handleToggle}
           className={getSidebarMenuItemClasses(
-            isCollapsed, 
+            isCollapsed,
             `sidebar-menu-item ${isOpen ? "bg-gray-100 dark:bg-gray-800" : ""}`
           )}
           title={isCollapsed ? MENU_LABELS.MORE_MENU : undefined}

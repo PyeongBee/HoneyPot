@@ -2,22 +2,22 @@
  * 네비게이션 관련 상수 정의
  */
 
-import { FileText, MoreHorizontal, Settings, Activity, LogIn, LogOut } from "lucide-react";
+import { Activity, FileText, LogIn, LogOut, Settings } from "lucide-react";
 
 export const NAVIGATION = {
-  LOGO_PATH: '/logo_Bee_lsh_clear_gra.png',
-  LOGO_ALT: '로고',
-  APP_NAME: '평비의 꿀단지',
+  LOGO_PATH: "/logo_Bee_lsh_clear_gra.png",
+  LOGO_ALT: "로고",
+  APP_NAME: "평비의 꿀단지",
 } as const;
 
 // 메뉴 라벨 상수
 export const MENU_LABELS = {
-  MORE_MENU: '더 보기',
-  EDITOR: '자소서 에디터',
-  ACTIVITY: '내활동',
-  SETTINGS: '설정',
-  LOGIN: '로그인',
-  LOGOUT: '로그아웃',
+  MORE_MENU: "더 보기",
+  EDITOR: "자소서 에디터",
+  ACTIVITY: "내활동",
+  SETTINGS: "설정",
+  LOGIN: "로그인",
+  LOGOUT: "로그아웃",
 } as const;
 
 // 메인 메뉴 아이템
@@ -25,7 +25,6 @@ export const MENU_ITEMS = [
   { icon: FileText, label: MENU_LABELS.EDITOR, href: "/editor" },
   // { icon: UserSearch, label: "스터디 목록", href: "/study" },
   // { icon: CircleUserRound, label: "프로필", href: "/profile" },
-  { icon: MoreHorizontal, label: MENU_LABELS.MORE_MENU, href: "/more" },
 ] as const;
 
 // 더 보기 드롭다운 메뉴 아이템

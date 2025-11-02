@@ -3,7 +3,7 @@
 import { signOut } from "@/lib/actions/auth";
 import { useAuthStore } from "@/stores/authStore";
 import { useToastStore } from "@/stores/toastStore";
-import { ChevronDown, LogOut, Settings, User } from "lucide-react";
+import { Activity, ChevronDown, LogOut, Settings, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -13,10 +13,15 @@ interface UserProfileProps {
 
 export default function UserProfile({ isCollapsed }: UserProfileProps) {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated, reset } = useAuthStore();
   const { addToast } = useToastStore();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 인증 상태 변경 시 드롭다운 닫기 (로그인/로그아웃 시 메뉴 상태 초기화)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [isAuthenticated]);
 
   // 드롭다운 외부 클릭 감지
   useEffect(() => {
@@ -53,9 +58,15 @@ export default function UserProfile({ isCollapsed }: UserProfileProps) {
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      // authStore 상태 초기화
+      reset();
       addToast("로그아웃되었습니다.", "success");
+      await signOut();
     } catch (error) {
+      // redirect 에러는 정상적인 동작이므로 다시 throw
+      if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+        throw error;
+      }
       addToast("로그아웃에 실패했습니다.", "error");
     }
   };
@@ -110,6 +121,16 @@ export default function UserProfile({ isCollapsed }: UserProfileProps) {
             <button
               onClick={() => {
                 setIsOpen(false);
+                router.push("/activity");
+              }}
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <Activity className="w-4 h-4" />
+              <span>내 활동</span>
+            </button>
+            <button
+              onClick={() => {
+                setIsOpen(false);
                 router.push("/settings");
               }}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -139,6 +160,16 @@ export default function UserProfile({ isCollapsed }: UserProfileProps) {
                 {user.email}
               </div>
             </div>
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                router.push("/activity");
+              }}
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <Activity className="w-4 h-4" />
+              <span>내 활동</span>
+            </button>
             <button
               onClick={() => {
                 setIsOpen(false);
