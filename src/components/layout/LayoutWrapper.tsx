@@ -78,11 +78,14 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // 인증 페이지인지 확인 (네비게이션 숨김)
+  const isAuthPage = pathname === "/reset-password";
+
   return (
     <AuthProvider>
       <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-        {/* 데스크톱 사이드바 - 클라이언트에서만 표시 */}
-        {!isMobile && isClient && (
+        {/* 데스크톱 사이드바 - 클라이언트에서만 표시, 인증 페이지에서는 숨김 */}
+        {!isMobile && isClient && !isAuthPage && (
           <div className="relative">
             <Sidebar
               isCollapsed={isCollapsed}
@@ -96,8 +99,8 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
         <div className="flex-1 flex flex-col overflow-hidden">
           <main
             className={`flex-1 overflow-auto ${
-              isMobile
-                ? "pb-16" // 모바일에서는 하단 네비게이션 공간 확보
+              isMobile && !isAuthPage
+                ? "pb-16" // 모바일에서는 하단 네비게이션 공간 확보 (인증 페이지 제외)
                 : ""
             }`}
           >
@@ -109,8 +112,8 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
           </main>
         </div>
 
-        {/* 모바일 하단 네비게이션 */}
-        {isMobile && <MobileNavigation />}
+        {/* 모바일 하단 네비게이션 - 인증 페이지에서는 숨김 */}
+        {isMobile && !isAuthPage && <MobileNavigation />}
       </div>
 
       {/* 컨펌 다이얼로그 */}
