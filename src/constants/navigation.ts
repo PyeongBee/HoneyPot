@@ -2,7 +2,7 @@
  * 네비게이션 관련 상수 정의
  */
 
-import { Activity, FileText, LogIn, LogOut, Settings } from "lucide-react";
+import { FileText, LogIn, LogOut } from "lucide-react";
 
 export const NAVIGATION = {
   LOGO_PATH: "/logo_Bee_lsh_clear_gra.png",
@@ -12,7 +12,6 @@ export const NAVIGATION = {
 
 // 메뉴 라벨 상수
 export const MENU_LABELS = {
-  MORE_MENU: "더 보기",
   EDITOR: "자소서 에디터",
   ACTIVITY: "내활동",
   SETTINGS: "설정",
@@ -25,12 +24,6 @@ export const MENU_ITEMS = [
   { icon: FileText, label: MENU_LABELS.EDITOR, href: "/editor" },
   // { icon: UserSearch, label: "스터디 목록", href: "/study" },
   // { icon: CircleUserRound, label: "프로필", href: "/profile" },
-] as const;
-
-// 더 보기 드롭다운 메뉴 아이템
-export const MORE_MENU_ITEMS = [
-  { icon: Activity, label: MENU_LABELS.ACTIVITY, href: "/activity" },
-  { icon: Settings, label: MENU_LABELS.SETTINGS, href: "/settings" },
 ] as const;
 
 // 인증 관련 메뉴 아이템

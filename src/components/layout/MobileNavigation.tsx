@@ -7,26 +7,24 @@ import {
   LONG_PRESS_DURATION,
   TOOLTIP_DISPLAY_DURATION,
 } from "../../constants/editor";
-import { MENU_ITEMS, MENU_LABELS } from "../../constants/navigation";
+import { MENU_ITEMS } from "../../constants/navigation";
 import { useConfirmStore } from "../../stores/confirmStore";
 import {
   cn,
   getMobileNavButtonClasses,
   mobileNavStyles,
 } from "../../styles/components";
-import MoreMenuDropdown from "../common/MoreMenuDropdown";
 
 export default function MobileNavigation() {
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   );
-  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const { showConfirm } = useConfirmStore();
 
-  // 통합된 메뉴 소스에서 가져오기
+  // 메뉴 아이템
   const menuItems = MENU_ITEMS;
 
   const handleMouseEnter = (index: number) => {
@@ -83,57 +81,28 @@ export default function MobileNavigation() {
     }
   };
 
-  const handleMoreMenuItemClick = (href: string) => {
-    handleNavigation(href);
-  };
-
   return (
     <div className={cn(mobileNavStyles.container)}>
       <nav className={mobileNavStyles.nav}>
         {menuItems.map((item, index) => {
           const IconComponent = item.icon;
-          const isMoreMenu = item.label === MENU_LABELS.MORE_MENU;
 
           return (
             <div key={index} className="relative">
-              {isMoreMenu ? (
-                <MoreMenuDropdown
-                  position="bottom"
-                  align="center"
-                  showButton={false}
-                  isOpen={isMoreMenuOpen}
-                  onToggle={setIsMoreMenuOpen}
-                  onItemClick={handleMoreMenuItemClick}
-                />
-              ) : null}
-
-              {isMoreMenu ? (
-                <button
-                  onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
-                  className={getMobileNavButtonClasses()}
-                  onMouseEnter={() => handleMouseEnter(index)}
-                  onMouseLeave={handleMouseLeave}
-                  onTouchStart={() => handleTouchStart(index)}
-                  onTouchEnd={handleTouchEnd}
-                >
-                  <IconComponent className={mobileNavStyles.icon} />
-                </button>
-              ) : (
-                <Link
-                  href={item.href}
-                  onClick={e => {
-                    e.preventDefault();
-                    handleNavigation(item.href);
-                  }}
-                  className={getMobileNavButtonClasses()}
-                  onMouseEnter={() => handleMouseEnter(index)}
-                  onMouseLeave={handleMouseLeave}
-                  onTouchStart={() => handleTouchStart(index)}
-                  onTouchEnd={handleTouchEnd}
-                >
-                  <IconComponent className={mobileNavStyles.icon} />
-                </Link>
-              )}
+              <Link
+                href={item.href}
+                onClick={e => {
+                  e.preventDefault();
+                  handleNavigation(item.href);
+                }}
+                className={getMobileNavButtonClasses()}
+                onMouseEnter={() => handleMouseEnter(index)}
+                onMouseLeave={handleMouseLeave}
+                onTouchStart={() => handleTouchStart(index)}
+                onTouchEnd={handleTouchEnd}
+              >
+                <IconComponent className={mobileNavStyles.icon} />
+              </Link>
 
               {/* 툴팁 */}
               {hoveredItem === index && (

@@ -1,12 +1,10 @@
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
-import { MENU_LABELS } from "../../../constants/navigation";
 import {
   getSidebarMenuItemClasses,
   sidebarMenuItemStyles,
 } from "../../../styles/components";
 import { MenuItem } from "../../../types/components";
-import MoreDropdown from "./MoreDropdown";
 
 interface SidebarMenuItemProps {
   item: MenuItem;
@@ -22,11 +20,6 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
   const router = useRouter();
   const pathname = usePathname();
   const IconComponent = item.icon;
-
-  // 더보기 메뉴인 경우 드롭다운 컴포넌트 렌더링
-  if (item.label === MENU_LABELS.MORE_MENU) {
-    return <MoreDropdown isCollapsed={isCollapsed} onNavigate={onNavigate} />;
-  }
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();

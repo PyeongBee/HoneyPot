@@ -19,7 +19,7 @@ export default function ShareButton({ isMobile, onClick }: ShareButtonProps) {
                  transition-all duration-300 ease-in-out
                  hover:scale-105 active:scale-95
                  group
-                 ${isMobile ? "bottom-20" : "bottom-3"}`}
+                 ${isMobile ? "bottom-16" : "bottom-3"}`}
       aria-label="작성한 자소서 공유하기"
     >
       <Share2 className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-200" />
