@@ -1,6 +1,7 @@
 import { AuthActions, AuthState } from "@/types/auth";
 import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
+import { useToastStore } from "./toastStore";
 
 /**
  * 인증 상태를 관리하는 Zustand Store
@@ -25,10 +26,14 @@ export const useAuthStore = create<AuthStoreState>(set => ({
 
   setLoading: (isLoading: boolean) => set({ isLoading }),
 
-  reset: () =>
+  reset: () => {
+    // 토스트 스토어도 함께 초기화
+    useToastStore.getState().clearAllToasts();
+
     set({
       user: null,
       isLoading: false,
       isAuthenticated: false,
-    }),
+    });
+  },
 }));

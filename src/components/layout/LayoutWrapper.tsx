@@ -53,6 +53,18 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   useEffect(() => {
     setIsClient(true);
 
+    // 다크모드 초기화
+    const theme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+
+    if (theme === "dark" || (!theme && prefersDark)) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
     const checkMobile = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     };

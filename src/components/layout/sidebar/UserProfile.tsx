@@ -58,9 +58,11 @@ export default function UserProfile({ isCollapsed }: UserProfileProps) {
 
   const handleLogout = async () => {
     try {
-      // authStore 상태 초기화
+      // authStore 상태 초기화 (토스트 스토어도 함께 초기화됨)
       reset();
+      // 로그아웃 성공 토스트 추가
       addToast("로그아웃되었습니다.", "success");
+      // 로그아웃 및 리다이렉트
       await signOut();
     } catch (error) {
       // redirect 에러는 정상적인 동작이므로 다시 throw
@@ -92,7 +94,7 @@ export default function UserProfile({ isCollapsed }: UserProfileProps) {
           title={displayName}
         >
           {/* 아바타 */}
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
             {initials}
           </div>
 
