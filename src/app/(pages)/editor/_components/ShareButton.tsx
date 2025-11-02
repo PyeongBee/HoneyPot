@@ -11,7 +11,7 @@ export default function ShareButton({ isMobile, onClick }: ShareButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={`fixed right-3 z-[1000] 
+      className={`fixed right-7 z-[1000] 
                  w-14 h-14 rounded-full 
                  bg-gradient-to-br from-brand-primary to-brand-secondary
                  shadow-lg hover:shadow-xl

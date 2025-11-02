@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import { MOBILE_BREAKPOINT } from "../../constants/editor";
 import { useConfirmStore } from "../../stores/confirmStore";
 import { useSidebarStore } from "../../stores/sidebarStore";
+import { ToastData, useToastStore } from "../../stores/toastStore";
 import AuthProvider from "../auth/AuthProvider";
 import ConfirmDialog from "../common/ConfirmDialog";
+import Toast from "../common/Toast";
 import MobileNavigation from "./MobileNavigation";
 import Sidebar from "./Sidebar";
 
@@ -17,6 +19,7 @@ interface LayoutWrapperProps {
 export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const { isCollapsed, toggleSidebar } = useSidebarStore();
   const { showConfirm } = useConfirmStore();
+  const { toasts, removeToast } = useToastStore();
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -112,6 +115,17 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
       {/* 컨펌 다이얼로그 */}
       <ConfirmDialog />
+
+      {/* 토스트 메시지 - 전역에서 사용 */}
+      {toasts.map((toast: ToastData) => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          duration={toast.duration}
+          onClose={() => removeToast(toast.id)}
+        />
+      ))}
     </AuthProvider>
   );
 }

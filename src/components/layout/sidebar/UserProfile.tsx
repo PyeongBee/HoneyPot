@@ -82,7 +82,7 @@ export default function UserProfile({ isCollapsed }: UserProfileProps) {
 
   return (
     <div
-      className="border-t border-gray-200 dark:border-gray-700 p-3"
+      className="border-t border-gray-200 dark:border-gray-700 py-1 px-3"
       ref={dropdownRef}
     >
       <div className="relative">

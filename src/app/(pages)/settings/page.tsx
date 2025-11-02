@@ -2,30 +2,20 @@
 
 import { Button } from "@/components/common/Button";
 import { Card, CardDescription, CardTitle } from "@/components/common/Card";
-import Toast from "@/components/common/Toast";
 import ToggleSwitch from "@/components/common/ToggleSwitch";
 import { signOut } from "@/lib/actions/auth";
 import { useAuthStore } from "@/stores/authStore";
 import { useConfirmStore } from "@/stores/confirmStore";
-import { ToastData, useToastStore } from "@/stores/toastStore";
+import { useToastStore } from "@/stores/toastStore";
 import { clearShareHistory } from "@/utils/shareHistoryUtils";
-import {
-  Bell,
-  Database,
-  LogOut,
-  Moon,
-  Shield,
-  Sun,
-  Trash2,
-  User,
-} from "lucide-react";
+import { Database, Moon, Sun, Trash2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { toasts, showSuccess, showError, removeToast } = useToastStore();
+  const { showSuccess, showError } = useToastStore();
   const { showConfirm } = useConfirmStore();
 
   // 설정 상태들
@@ -213,68 +203,6 @@ export default function SettingsPage() {
             </div>
           </Card>
 
-          {/* 알림 설정 */}
-          <Card className="p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              <CardTitle className="mb-0">알림 설정</CardTitle>
-            </div>
-            <CardDescription>받고 싶은 알림을 선택하세요.</CardDescription>
-
-            <div className="space-y-4 mt-4">
-              <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
-                <div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white block mb-1">
-                    이메일 알림
-                  </span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400">
-                    중요한 업데이트를 이메일로 받습니다
-                  </span>
-                </div>
-                <ToggleSwitch
-                  checked={notifications.email}
-                  onChange={checked =>
-                    handleNotificationToggle("email", checked)
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
-                <div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white block mb-1">
-                    푸시 알림
-                  </span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400">
-                    브라우저 푸시 알림을 받습니다
-                  </span>
-                </div>
-                <ToggleSwitch
-                  checked={notifications.push}
-                  onChange={checked =>
-                    handleNotificationToggle("push", checked)
-                  }
-                />
-              </div>
-
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white block mb-1">
-                    업데이트 알림
-                  </span>
-                  <span className="text-xs text-gray-600 dark:text-gray-400">
-                    새로운 기능과 개선사항을 알려드립니다
-                  </span>
-                </div>
-                <ToggleSwitch
-                  checked={notifications.updates}
-                  onChange={checked =>
-                    handleNotificationToggle("updates", checked)
-                  }
-                />
-              </div>
-            </div>
-          </Card>
-
           {/* 데이터 관리 */}
           <Card className="p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -303,66 +231,7 @@ export default function SettingsPage() {
               </Button>
             </div>
           </Card>
-
-          {/* 계정 관리 */}
-          {user && (
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                <CardTitle className="mb-0">계정 관리</CardTitle>
-              </div>
-              <CardDescription>
-                계정 로그아웃 및 삭제 등을 관리합니다.
-              </CardDescription>
-
-              <div className="space-y-3 mt-4">
-                <Button
-                  variant="outline"
-                  onClick={handleLogout}
-                  className="w-full justify-between text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <LogOut className="w-4 h-4" />
-                    <div>
-                      <div className="text-sm font-medium">로그아웃</div>
-                      <div className="text-xs text-gray-500">
-                        현재 계정에서 로그아웃합니다
-                      </div>
-                    </div>
-                  </div>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={handleDeleteAccount}
-                  className="w-full justify-between text-left border-red-200 hover:border-red-300 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-900/20"
-                >
-                  <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
-                    <Trash2 className="w-4 h-4" />
-                    <div>
-                      <div className="text-sm font-medium">계정 삭제</div>
-                      <div className="text-xs">
-                        계정과 모든 데이터를 영구적으로 삭제합니다
-                      </div>
-                    </div>
-                  </div>
-                </Button>
-              </div>
-            </Card>
-          )}
         </div>
-      </div>
-
-      {/* 토스트 메시지 */}
-      <div className="fixed bottom-4 right-4 z-50 space-y-2">
-        {toasts.map((toast: ToastData) => (
-          <Toast
-            key={toast.id}
-            message={toast.message}
-            type={toast.type}
-            onClose={() => removeToast(toast.id)}
-          />
-        ))}
       </div>
     </div>
   );

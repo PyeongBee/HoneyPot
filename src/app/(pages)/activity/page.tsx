@@ -2,9 +2,8 @@
 
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
-import Toast from "@/components/common/Toast";
 import { useConfirmStore } from "@/stores/confirmStore";
-import { ToastData, useToastStore } from "@/stores/toastStore";
+import { useToastStore } from "@/stores/toastStore";
 import { ShareHistory } from "@/types/editor";
 import { copyToClipboard } from "@/utils/clipboardUtils";
 import {
@@ -18,7 +17,7 @@ import { useCallback, useEffect, useState } from "react";
 export default function ActivityPage() {
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { toasts, showSuccess, showError, removeToast } = useToastStore();
+  const { showSuccess, showError } = useToastStore();
   const { showConfirm } = useConfirmStore();
 
   const loadShareHistory = useCallback(() => {
@@ -282,18 +281,6 @@ export default function ActivityPage() {
             </div>
           )}
         </Card>
-      </div>
-
-      {/* 토스트 메시지 */}
-      <div className="fixed bottom-4 right-4 z-50 space-y-2">
-        {toasts.map((toast: ToastData) => (
-          <Toast
-            key={toast.id}
-            message={toast.message}
-            type={toast.type}
-            onClose={() => removeToast(toast.id)}
-          />
-        ))}
       </div>
     </div>
   );

@@ -5,7 +5,6 @@
 "use client";
 
 import React, { useCallback } from "react";
-import Toast from "../../../../components/common/Toast";
 import { MESSAGES } from "../../../../constants";
 import { useQualityCheck } from "../../../../hooks/useQualityCheck";
 import { useSpellCheck } from "../../../../hooks/useSpellCheck";
@@ -29,7 +28,7 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
   onEditedChange,
   onQualityCheckToggle,
 }) {
-  const { toasts, showError, showSuccess, removeToast } = useToastStore();
+  const { showError, showSuccess } = useToastStore();
   const { isSpellCheckMode, isLoading, performSpellCheck, cancelSpellCheck } =
     useSpellCheck({
       showError,
@@ -125,16 +124,6 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
           {renderEditorContent()}
         </div>
       </div>
-
-      {toasts.map(toast => (
-        <Toast
-          key={toast.id}
-          message={toast.message}
-          type={toast.type}
-          duration={toast.duration}
-          onClose={() => removeToast(toast.id)}
-        />
-      ))}
     </>
   );
 });

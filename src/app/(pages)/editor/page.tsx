@@ -1,6 +1,5 @@
 "use client";
 
-import Toast from "@/components/common/Toast";
 import {
   LazyDiffViewer,
   LazyEditor,
@@ -16,7 +15,7 @@ import { useConfirmStore } from "@/stores/confirmStore";
 import { useDeviceStore } from "@/stores/deviceStore";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { useSpellCheckStore } from "@/stores/spellCheckStore";
-import { ToastData, useToastStore } from "@/stores/toastStore";
+import { useToastStore } from "@/stores/toastStore";
 import { getTextStats } from "@/utils/textUtils";
 import { useCallback, useEffect, useState } from "react";
 import EditorSidebar from "./_components/layout/EditorSidebar";
@@ -30,7 +29,7 @@ export const dynamic = "force-dynamic";
 export default function EditorPage() {
   const { isMobile, checkDevice } = useDeviceStore();
   const { isSpellCheckMode } = useSpellCheckStore();
-  const { toasts, showSuccess, showError, removeToast } = useToastStore();
+  const { showSuccess, showError } = useToastStore();
   const { showConfirm } = useConfirmStore();
   const { isCollapsed } = useSidebarStore();
 
@@ -272,16 +271,6 @@ export default function EditorPage() {
         onShare={createShare}
         onCopy={copyShareUrl}
       />
-
-      {toasts.map((toast: ToastData) => (
-        <Toast
-          key={toast.id}
-          message={toast.message}
-          type={toast.type}
-          duration={toast.duration}
-          onClose={() => removeToast(toast.id)}
-        />
-      ))}
     </div>
   );
 }

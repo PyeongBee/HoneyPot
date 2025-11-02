@@ -268,7 +268,7 @@ body {
 
 .sidebar-logo {
   transition: all 0.3s ease-in-out;
-  min-height: 60px;
+  min-height: 50px;
   display: flex;
   align-items: center;
 }
