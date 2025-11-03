@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, LogOut, Settings, User } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -8,7 +8,7 @@ import {
   LONG_PRESS_DURATION,
   TOOLTIP_DISPLAY_DURATION,
 } from "../../constants/editor";
-import { MENU_ITEMS } from "../../constants/navigation";
+import { MENU_ITEMS, MENU_LABELS, MORE_MENU_ITEMS, MORE_MENU_ITEMS_GUEST } from "../../constants/navigation";
 import { signOut } from "../../lib/actions/auth";
 import { useAuthStore } from "../../stores/authStore";
 import { useConfirmStore } from "../../stores/confirmStore";
@@ -83,6 +83,11 @@ export default function MobileNavigation() {
   };
 
   const handleNavigation = (href: string) => {
+    // 현재 페이지와 같은 경로면 이동하지 않음
+    if (pathname === href) {
+      return;
+    }
+
     if (pathname === "/editor") {
       // 에디터 페이지에서 나갈 때 확인
       const editorContent = sessionStorage.getItem("editorContent");
@@ -128,10 +133,6 @@ export default function MobileNavigation() {
     handleNavigation(href);
   };
 
-  const getInitials = (email: string) => {
-    return email.substring(0, 2).toUpperCase();
-  };
-
   return (
     <div className={cn(mobileNavStyles.container)}>
       <nav className={mobileNavStyles.nav}>
@@ -166,55 +167,60 @@ export default function MobileNavigation() {
           );
         })}
 
-        {/* 프로필 메뉴 */}
+        {/* 더보기 메뉴 */}
         <div ref={profileMenuRef} className="relative">
-          {/* 프로필 드롭다운 메뉴 */}
-          {isProfileMenuOpen && user && (
+          {/* 더보기 드롭다운 메뉴 */}
+          {isProfileMenuOpen && (
             <div className="absolute bottom-full right-0 mb-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
-              {/* 사용자 정보 */}
-              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                  {user.user_metadata?.full_name || user.email}
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  {user.email}
-                </div>
-              </div>
+              {user && (
+                <>
+                  {/* 사용자 정보 */}
+                  <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                    <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      {user.user_metadata?.full_name || user.email}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {user.email}
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* 메뉴 아이템 */}
-              <button
-                onClick={() => handleProfileMenuClick("/activity")}
-                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Activity className="w-4 h-4" />
-                <span>내 활동</span>
-              </button>
-              <button
-                onClick={() => handleProfileMenuClick("/settings")}
-                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Settings className="w-4 h-4" />
-                <span>설정</span>
-              </button>
-              <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>로그아웃</span>
-              </button>
+              {(user ? MORE_MENU_ITEMS : MORE_MENU_ITEMS_GUEST).map((item) => {
+                const IconComponent = item.icon;
+                
+                return (
+                  <button
+                    key={item.href}
+                    onClick={() => handleProfileMenuClick(item.href)}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <IconComponent className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+
+              {user && (
+                <>
+                  <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>{MENU_LABELS.LOGOUT}</span>
+                  </button>
+                </>
+              )}
             </div>
           )}
 
-          {/* 프로필 버튼 */}
+          {/* 더보기 버튼 */}
           <button
             onClick={() => {
-              if (!user) {
-                router.push("/login");
-              } else {
-                setIsProfileMenuOpen(!isProfileMenuOpen);
-              }
+              setIsProfileMenuOpen(!isProfileMenuOpen);
             }}
             className={getMobileNavButtonClasses()}
             onMouseEnter={() => handleMouseEnter(menuItems.length)}
@@ -222,19 +228,13 @@ export default function MobileNavigation() {
             onTouchStart={() => handleTouchStart(menuItems.length)}
             onTouchEnd={handleTouchEnd}
           >
-            {user ? (
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-white text-xs font-bold">
-                {getInitials(user.email || "")}
-              </div>
-            ) : (
-              <User className={mobileNavStyles.icon} />
-            )}
+            <Menu className={mobileNavStyles.icon} />
           </button>
 
           {/* 툴팁 */}
           {hoveredItem === menuItems.length && (
             <div className={cn(mobileNavStyles.tooltip.container)}>
-              {user ? "프로필" : "로그인"}
+              {MENU_LABELS.MORE}
               <div className={cn(mobileNavStyles.tooltip.arrow)}></div>
             </div>
           )}

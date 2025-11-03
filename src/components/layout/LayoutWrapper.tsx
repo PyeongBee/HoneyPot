@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MOBILE_BREAKPOINT } from "../../constants/editor";
 import { useConfirmStore } from "../../stores/confirmStore";
@@ -21,6 +21,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const { showConfirm } = useConfirmStore();
   const { toasts, removeToast } = useToastStore();
   const pathname = usePathname();
+  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
@@ -42,14 +43,14 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
           variant: "destructive",
           onConfirm: () => {
             sessionStorage.removeItem("editorContent");
-            window.location.href = href;
+            router.push(href);
           },
         });
       } else {
-        window.location.href = href;
+        router.push(href);
       }
     } else {
-      window.location.href = href;
+      router.push(href);
     }
   };
 

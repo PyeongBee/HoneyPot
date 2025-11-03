@@ -38,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         ))}
       </nav>
 
-      <UserProfile isCollapsed={isCollapsed} />
+      <UserProfile isCollapsed={isCollapsed} onNavigate={onNavigate} />
 
       <SidebarToggle isCollapsed={isCollapsed} onToggle={onToggle} />
     </div>
