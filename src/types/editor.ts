@@ -90,7 +90,7 @@ export interface CopyResult {
   message: string;
 }
 
-export const SHARE_DATA_VERSION = "v2";
+export const SHARE_DATA_VERSION = "v2" as const;
 
 export function isShareDataV2(data: ShareData): data is ShareDataV2 {
   const candidate = data as ShareDataV2;

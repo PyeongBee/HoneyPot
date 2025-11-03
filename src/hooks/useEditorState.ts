@@ -30,21 +30,21 @@ const createQuestionId = () => {
 };
 
 const createQuestion = (
-  overrides: Partial<EditorQuestionState> = {}
+  overrides?: Partial<EditorQuestionState>
 ): EditorQuestionState => ({
-  id: overrides.id ?? createQuestionId(),
-  questionText: overrides.questionText ?? "",
-  questionCharLimit: overrides.questionCharLimit ?? DEFAULT_CHAR_LIMIT,
-  originalText: overrides.originalText ?? "",
-  editedText: overrides.editedText ?? "",
-  memos: overrides.memos ?? [],
+  id: overrides?.id ?? createQuestionId(),
+  questionText: overrides?.questionText ?? "",
+  questionCharLimit: overrides?.questionCharLimit ?? DEFAULT_CHAR_LIMIT,
+  originalText: overrides?.originalText ?? "",
+  editedText: overrides?.editedText ?? "",
+  memos: overrides?.memos ?? [],
 });
 
 const ensureQuestions = (
   questions: EditorQuestionState[]
 ): EditorQuestionState[] => {
   if (questions.length === 0) {
-    return [createQuestion()];
+    return [createQuestion({})];
   }
 
   return questions;
@@ -96,16 +96,17 @@ const fromShareDataV2 = (shareData: ShareDataV2): ShareLoadResult => {
 };
 
 export function useEditorState() {
-  const initialQuestionRef = useRef<EditorQuestionState>();
+  const initialQuestionRef = useRef<EditorQuestionState | null>(null);
   if (!initialQuestionRef.current) {
-    initialQuestionRef.current = createQuestion();
+    initialQuestionRef.current = createQuestion({});
   }
+  const initialQuestion = initialQuestionRef.current;
 
   const [questions, setQuestions] = useState<EditorQuestionState[]>(() => [
-    initialQuestionRef.current!,
+    initialQuestion,
   ]);
   const [activeQuestionId, setActiveQuestionId] = useState<string>(
-    initialQuestionRef.current!.id
+    initialQuestion.id
   );
   const [viewMode, setViewMode] = useState<ViewMode>("original");
   const [isClient, setIsClient] = useState<boolean>(false);
@@ -231,7 +232,7 @@ export function useEditorState() {
 
   // 텍스트 초기화
   const resetTexts = useCallback(() => {
-    const question = createQuestion();
+    const question = createQuestion({});
     setQuestions([question]);
     setActiveQuestionId(question.id);
     setViewMode("original");
@@ -288,7 +289,7 @@ export function useEditorState() {
   );
 
   const addQuestion = useCallback(() => {
-    const newQuestion = createQuestion();
+    const newQuestion = createQuestion({});
     setQuestions(prev => [...prev, newQuestion]);
     setActiveQuestionId(newQuestion.id);
     return newQuestion.id;

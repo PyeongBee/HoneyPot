@@ -22,12 +22,15 @@ const normalizeShareData = (data: ShareData): ShareData => {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   if (!id) {
-    return NextResponse.json({ error: "공유 ID가 필요합니다." }, { status: 400 });
+    return NextResponse.json(
+      { error: "공유 ID가 필요합니다." },
+      { status: 400 }
+    );
   }
 
   const supabase = await createClient();
@@ -47,7 +50,10 @@ export async function GET(
   }
 
   if (!data) {
-    return NextResponse.json({ error: "공유를 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json(
+      { error: "공유를 찾을 수 없습니다." },
+      { status: 404 }
+    );
   }
 
   return NextResponse.json({
@@ -62,12 +68,15 @@ export async function GET(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   if (!id) {
-    return NextResponse.json({ error: "공유 ID가 필요합니다." }, { status: 400 });
+    return NextResponse.json(
+      { error: "공유 ID가 필요합니다." },
+      { status: 400 }
+    );
   }
 
   const supabase = await createClient();
@@ -100,4 +109,3 @@ export async function DELETE(
 
   return NextResponse.json({ success: true });
 }
-
