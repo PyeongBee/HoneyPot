@@ -1,6 +1,7 @@
 "use client";
 
 import { InputField, InputLabel } from "@/components/common/Input";
+import clsx from "clsx";
 import {
   CHAR_LIMIT_STEP,
   DEFAULT_CHAR_LIMIT,
@@ -15,6 +16,7 @@ interface QuestionEditorProps {
   questionCharLimit: number;
   onQuestionChange: (text: string) => void;
   onQuestionLimitChange: (limit: number) => void;
+  containerClassName?: string;
 }
 
 export default function QuestionEditor({
@@ -23,9 +25,15 @@ export default function QuestionEditor({
   questionCharLimit,
   onQuestionChange,
   onQuestionLimitChange,
+  containerClassName,
 }: QuestionEditorProps) {
   return (
-    <div className="mt-20 px-6 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <div
+      className={clsx(
+        "px-6 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700",
+        containerClassName ?? "mt-20"
+      )}
+    >
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
         {viewMode === "original" ? (
           <div className="lg:col-span-3">

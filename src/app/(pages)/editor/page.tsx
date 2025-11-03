@@ -11,16 +11,19 @@ import { useEditorState } from "@/hooks/useEditorState";
 import { useShareFeature } from "@/hooks/useShareFeature";
 import { useTextCorrections } from "@/hooks/useTextCorrections";
 import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
+import { SHARE_DATA_VERSION } from "@/types/editor";
+import { useAuthStore } from "@/stores/authStore";
 import { useConfirmStore } from "@/stores/confirmStore";
 import { useDeviceStore } from "@/stores/deviceStore";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { useSpellCheckStore } from "@/stores/spellCheckStore";
 import { useToastStore } from "@/stores/toastStore";
 import { getTextStats } from "@/utils/textUtils";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import EditorSidebar from "./_components/layout/EditorSidebar";
 import EditorUpperHeader from "./_components/layout/EditorUpperHeader";
 import QuestionEditor from "./_components/QuestionEditor";
+import QuestionTabs from "./_components/QuestionTabs";
 import ShareButton from "./_components/ShareButton";
 import ShareModal from "./_components/ShareModal";
 
@@ -32,8 +35,11 @@ export default function EditorPage() {
   const { showSuccess, showError } = useToastStore();
   const { showConfirm } = useConfirmStore();
   const { isCollapsed } = useSidebarStore();
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   const {
+    questions,
+    activeQuestionId,
     originalText,
     editedText,
     questionText,
@@ -46,10 +52,12 @@ export default function EditorPage() {
     setQuestionText,
     setQuestionCharLimit,
     setViewMode,
+    setActiveQuestionId,
     loadSharedData,
     addMemo,
     deleteMemo,
-    resetTexts,
+    addQuestion,
+    removeQuestion,
   } = useEditorState();
 
   const { createShare, copyShareUrl } = useShareFeature(showSuccess, showError);
@@ -67,14 +75,25 @@ export default function EditorPage() {
   const [isQualityCheckActive, setIsQualityCheckActive] =
     useState<boolean>(false);
   const [highlightedMemo, setHighlightedMemo] = useState<string | null>(null);
+  useEffect(() => {
+    setHighlightedMemo(null);
+  }, [activeQuestionId]);
 
   // UI 상태
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
   const [lastScrollY, setLastScrollY] = useState<number>(0);
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
 
+  const hasUnsavedChanges = useMemo(
+    () =>
+      questions.some(question =>
+        `${question.originalText}${question.editedText}${question.questionText}`.trim()
+      ),
+    [questions]
+  );
+
   // 변경사항 감지
-  useUnsavedChanges({ hasUnsavedChanges: !!(originalText || editedText) });
+  useUnsavedChanges({ hasUnsavedChanges });
 
   // 클라이언트 초기화
   useEffect(() => {
@@ -85,8 +104,27 @@ export default function EditorPage() {
   }, [checkDevice]);
 
   useEffect(() => {
+    if (!isClient) {
+      return;
+    }
+
+    const combinedContent = questions
+      .map(question =>
+        `${question.questionText ?? ""}${question.originalText ?? ""}${question.editedText ?? ""}`
+      )
+      .join(" ")
+      .trim();
+
+    if (combinedContent) {
+      sessionStorage.setItem("editorContent", combinedContent);
+    } else {
+      sessionStorage.removeItem("editorContent");
+    }
+  }, [questions, isClient]);
+
+  useEffect(() => {
     if (isClient) {
-      loadSharedData(showSuccess, showError);
+      void loadSharedData(showSuccess, showError);
     }
   }, [isClient, loadSharedData, showSuccess, showError]);
 
@@ -107,23 +145,23 @@ export default function EditorPage() {
     (mode: typeof viewMode) => {
       setViewMode(mode);
     },
-    [originalText, editedText, showError, setViewMode]
+    [setViewMode]
   );
 
-  const handleQuestionLimitChange = (limit: number) => {
-    setQuestionCharLimit(limit);
-  };
+  const handleQuestionLimitChange = useCallback(
+    (limit: number) => {
+      setQuestionCharLimit(limit);
+    },
+    [setQuestionCharLimit]
+  );
 
   // 문항 변경 핸들러
-  const handleQuestionChange = (text: string) => {
-    setQuestionText(text);
-    const totalContent = originalText + editedText + text;
-    if (totalContent.trim()) {
-      sessionStorage.setItem("editorContent", totalContent);
-    } else {
-      sessionStorage.removeItem("editorContent");
-    }
-  };
+  const handleQuestionChange = useCallback(
+    (text: string) => {
+      setQuestionText(text);
+    },
+    [setQuestionText]
+  );
 
   // 메모 핸들러
   const handleMemoClick = useCallback((memo: (typeof memos)[0]) => {
@@ -150,16 +188,56 @@ export default function EditorPage() {
 
   // 공유 핸들러
   const handleShareButtonClick = useCallback(() => {
-    if (!originalText && !editedText) {
+    const hasContent = questions.some(question =>
+      `${question.originalText}${question.editedText}${question.questionText}`.trim()
+    );
+
+    if (!hasContent) {
       showError("공유할 내용이 없습니다.");
       return;
     }
     setIsShareModalOpen(true);
-  }, [originalText, editedText, showError]);
+  }, [questions, showError]);
 
   const handleCloseShareModal = useCallback(() => {
     setIsShareModalOpen(false);
   }, []);
+
+  const handleSelectQuestion = useCallback(
+    (questionId: string) => {
+      setActiveQuestionId(questionId);
+    },
+    [setActiveQuestionId]
+  );
+
+  const handleAddQuestion = useCallback(() => {
+    addQuestion();
+    setViewMode("original");
+  }, [addQuestion, setViewMode]);
+
+  const handleRemoveQuestion = useCallback(
+    (questionId: string) => {
+      removeQuestion(questionId);
+    },
+    [removeQuestion]
+  );
+
+  const sharePayload = useMemo(
+    () => ({
+      version: SHARE_DATA_VERSION,
+      timestamp: new Date().toISOString(),
+      activeQuestionId,
+      questions: questions.map(question => ({
+        id: question.id,
+        question: question.questionText,
+        questionLimit: question.questionCharLimit,
+        original: question.originalText,
+        edited: question.editedText,
+        memos: question.memos,
+      })),
+    }),
+    [questions, activeQuestionId]
+  );
 
   // 통계 계산
   const originalStats = getTextStats(originalText, questionCharLimit);
@@ -202,12 +280,25 @@ export default function EditorPage() {
         onModeChange={handleModeChange}
       />
 
+      {isAuthenticated && (
+        <div className="mt-20">
+          <QuestionTabs
+            questions={questions}
+            activeQuestionId={activeQuestionId}
+            onSelect={handleSelectQuestion}
+            onAdd={handleAddQuestion}
+            onRemove={handleRemoveQuestion}
+          />
+        </div>
+      )}
+
       <QuestionEditor
         viewMode={viewMode}
         questionText={questionText}
         questionCharLimit={questionCharLimit}
         onQuestionChange={handleQuestionChange}
         onQuestionLimitChange={handleQuestionLimitChange}
+        containerClassName={isAuthenticated ? "mt-4" : undefined}
       />
 
       <div className="max-w-7xl mx-auto">
@@ -259,14 +350,7 @@ export default function EditorPage() {
 
       <ShareModal
         isOpen={isShareModalOpen}
-        shareData={{
-          original: originalText,
-          edited: editedText,
-          question: questionText,
-          questionLimit: questionCharLimit,
-          memos,
-          timestamp: new Date().toISOString(),
-        }}
+        shareData={sharePayload}
         onClose={handleCloseShareModal}
         onShare={createShare}
         onCopy={copyShareUrl}

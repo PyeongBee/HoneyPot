@@ -10,7 +10,7 @@ interface ShareModalProps {
   isOpen: boolean;
   shareData: ShareData;
   onClose: () => void;
-  onShare: (shareData: ShareData) => string; // 링크 생성 함수
+  onShare: (shareData: ShareData) => Promise<string>; // 링크 생성 함수
   onCopy: (url: string) => Promise<boolean>; // 복사 함수
 }
 
@@ -23,17 +23,43 @@ export default function ShareModal({
 }: ShareModalProps) {
   const [shareUrl, setShareUrl] = useState<string>("");
   const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // 모달이 열리면 링크 생성
   useEffect(() => {
-    if (isOpen && !shareUrl) {
+    let isActive = true;
+
+    const generateShareUrl = async () => {
+      if (!isOpen || shareUrl) {
+        return;
+      }
+
+      setIsGenerating(true);
+      setErrorMessage(null);
+
       try {
-        const url = onShare(shareData);
-        setShareUrl(url);
+        const url = await onShare(shareData);
+        if (isActive) {
+          setShareUrl(url);
+        }
       } catch (error) {
         console.error("링크 생성 실패:", error);
+        if (isActive) {
+          setErrorMessage("링크 생성에 실패했습니다. 다시 시도해주세요.");
+        }
+      } finally {
+        if (isActive) {
+          setIsGenerating(false);
+        }
       }
-    }
+    };
+
+    void generateShareUrl();
+
+    return () => {
+      isActive = false;
+    };
   }, [isOpen, shareData, onShare, shareUrl]);
 
   // 모달이 닫히면 상태 초기화
@@ -41,18 +67,22 @@ export default function ShareModal({
     if (!isOpen) {
       setShareUrl("");
       setIsCopied(false);
+      setIsGenerating(false);
+      setErrorMessage(null);
     }
   }, [isOpen]);
 
   const handleCopy = useCallback(async () => {
-    if (shareUrl) {
-      const success = await onCopy(shareUrl);
-      if (success) {
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000);
-      }
+    if (isGenerating || !shareUrl) {
+      return;
     }
-  }, [shareUrl, onCopy]);
+
+    const success = await onCopy(shareUrl);
+    if (success) {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
+  }, [shareUrl, onCopy, isGenerating]);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -94,13 +124,17 @@ export default function ShareModal({
               onChange={() => {}}
               readOnly
               className="flex-1 bg-gray-50 dark:bg-gray-700 text-sm font-mono"
-              placeholder="링크 생성 중..."
+              placeholder={
+                isGenerating
+                  ? "링크 생성 중..."
+                  : "생성된 링크가 여기에 표시됩니다."
+              }
             />
             <Button
               variant={isCopied ? "secondary" : "default"}
               onClick={handleCopy}
               className="whitespace-nowrap px-4"
-              disabled={!shareUrl}
+              disabled={!shareUrl || isGenerating}
             >
               {isCopied ? (
                 <>
@@ -115,6 +149,14 @@ export default function ShareModal({
               )}
             </Button>
           </div>
+          {isGenerating && (
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              링크를 생성하고 있습니다...
+            </p>
+          )}
+          {errorMessage && (
+            <p className="mt-2 text-sm text-red-500">{errorMessage}</p>
+          )}
         </div>
 
         {/* 안내 메시지 */}

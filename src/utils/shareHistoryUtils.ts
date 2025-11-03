@@ -2,20 +2,37 @@
  * 공유 기록 관리 유틸리티
  */
 
-import { ShareHistory, ShareData } from '../types/editor';
+import {
+  ShareHistory,
+  ShareData,
+  ShareDataV1,
+  ShareDataV2,
+  isShareDataV2,
+} from "../types/editor";
 
 const SHARE_HISTORY_KEY = 'share_history';
 
 /**
  * 공유 기록을 로컬스토리지에 저장
  */
-export const saveShareHistory = (shareData: ShareData, shareUrl: string): ShareHistory => {
+interface SaveShareHistoryOptions {
+  id?: string;
+  source?: ShareHistory["source"];
+  title?: string;
+}
+
+export const saveShareHistory = (
+  shareData: ShareData,
+  shareUrl: string,
+  options: SaveShareHistoryOptions = {}
+): ShareHistory => {
   const shareHistory: ShareHistory = {
-    id: generateHistoryId(),
-    title: generateShareTitle(shareData),
+    id: options.id ?? generateHistoryId(),
+    title: options.title ?? generateShareTitle(shareData),
     url: shareUrl,
     shareData,
     createdAt: new Date().toISOString(),
+    source: options.source ?? "local",
   };
 
   const existingHistory = getShareHistory();
@@ -38,7 +55,14 @@ export const getShareHistory = (): ShareHistory[] => {
     if (!historyJson) return [];
     
     const history = JSON.parse(historyJson);
-    return Array.isArray(history) ? history : [];
+    if (!Array.isArray(history)) {
+      return [];
+    }
+
+    return history.map(item => ({
+      ...item,
+      source: item.source ?? "local",
+    })) as ShareHistory[];
   } catch (error) {
     console.error('공유 기록 조회 실패:', error);
     return [];
@@ -71,20 +95,50 @@ const generateHistoryId = (): string => {
 /**
  * 공유 제목 생성 (질문 텍스트 기반)
  */
-const generateShareTitle = (shareData: ShareData): string => {
+export const generateShareTitle = (shareData: ShareData): string => {
+  if (isShareDataV2(shareData)) {
+    return generateTitleFromV2(shareData);
+  }
+
+  return generateTitleFromV1(shareData);
+};
+
+const generateTitleFromV1 = (shareData: ShareDataV1): string => {
   if (shareData.question && shareData.question.trim()) {
-    // 질문 텍스트가 있으면 첫 30자 사용
     const title = shareData.question.trim().substring(0, 30);
     return title.length < shareData.question.trim().length ? `${title}...` : title;
   }
-  
+
   if (shareData.original && shareData.original.trim()) {
-    // 원본 텍스트가 있으면 첫 30자 사용
     const title = shareData.original.trim().substring(0, 30);
     return title.length < shareData.original.trim().length ? `${title}...` : title;
   }
-  
-  // 둘 다 없으면 날짜 기반 제목
+
+  const date = new Date(shareData.timestamp);
+  return `자소서 작업 ${date.toLocaleDateString('ko-KR')}`;
+};
+
+const generateTitleFromV2 = (shareData: ShareDataV2): string => {
+  const targetQuestion =
+    shareData.questions.find(q => q.id === shareData.activeQuestionId) ??
+    shareData.questions[0];
+
+  if (targetQuestion) {
+    const candidates = [
+      targetQuestion.question,
+      targetQuestion.edited,
+      targetQuestion.original,
+    ];
+
+    for (const text of candidates) {
+      if (text && text.trim()) {
+        const trimmed = text.trim();
+        const title = trimmed.substring(0, 30);
+        return title.length < trimmed.length ? `${title}...` : title;
+      }
+    }
+  }
+
   const date = new Date(shareData.timestamp);
   return `자소서 작업 ${date.toLocaleDateString('ko-KR')}`;
 };

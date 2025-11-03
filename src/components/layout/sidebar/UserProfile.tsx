@@ -41,17 +41,85 @@ export default function UserProfile({ isCollapsed }: UserProfileProps) {
   // 로그인하지 않은 경우
   if (!user) {
     return (
-      <div className="border-t border-gray-200 dark:border-gray-700 p-3">
-        <button
-          onClick={() => router.push("/login")}
-          className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${
-            isCollapsed ? "justify-center" : ""
-          }`}
-          title="로그인"
-        >
-          <User className="w-5 h-5 flex-shrink-0" />
-          {!isCollapsed && <span>로그인</span>}
-        </button>
+      <div
+        className="border-t border-gray-200 dark:border-gray-700 py-1 px-3"
+        ref={dropdownRef}
+      >
+        <div className="relative">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${
+              isCollapsed ? "justify-center" : ""
+            }`}
+            title="더보기"
+          >
+            <User className="w-5 h-5 flex-shrink-0" />
+            {!isCollapsed && (
+              <>
+                <span className="flex-1 text-left truncate min-w-0">더보기</span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform flex-shrink-0 ${
+                    isOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </>
+            )}
+          </button>
+
+          {/* 드롭다운 메뉴 - 비로그인 */}
+          {isOpen && !isCollapsed && (
+            <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/activity");
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <Activity className="w-4 h-4" />
+                <span>내 활동</span>
+              </button>
+              <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/login");
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <User className="w-4 h-4" />
+                <span>로그인</span>
+              </button>
+            </div>
+          )}
+
+          {/* Collapsed 상태에서의 툴팁 메뉴 - 비로그인 */}
+          {isOpen && isCollapsed && (
+            <div className="absolute bottom-0 left-full ml-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50 min-w-[200px]">
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/activity");
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <Activity className="w-4 h-4" />
+                <span>내 활동</span>
+              </button>
+              <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  router.push("/login");
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <User className="w-4 h-4" />
+                <span>로그인</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
