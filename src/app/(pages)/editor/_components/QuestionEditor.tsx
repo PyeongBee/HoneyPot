@@ -1,7 +1,6 @@
 "use client";
 
 import { InputField, InputLabel } from "@/components/common/Input";
-import clsx from "clsx";
 import {
   CHAR_LIMIT_STEP,
   DEFAULT_CHAR_LIMIT,
@@ -9,6 +8,7 @@ import {
   MIN_CHAR_LIMIT,
 } from "@/constants/editor";
 import { ViewMode } from "@/types/editor";
+import clsx from "clsx";
 
 interface QuestionEditorProps {
   viewMode: ViewMode;
@@ -66,7 +66,7 @@ export default function QuestionEditor({
 
         {viewMode === "original" && (
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-2 h-2 bg-amber-800 rounded-full"></div>
                 <InputLabel

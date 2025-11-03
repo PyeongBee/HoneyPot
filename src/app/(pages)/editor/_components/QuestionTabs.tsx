@@ -44,7 +44,7 @@ export default function QuestionTabs({
   const canRemove = useMemo(() => questions.length > 1, [questions.length]);
 
   return (
-    <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+    <div className="dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3 gap-4">
           <div className="flex-1 overflow-x-auto">
@@ -94,12 +94,10 @@ export default function QuestionTabs({
             onClick={onAdd}
             className="shrink-0 border border-dashed border-gray-300 dark:border-gray-600 hover:border-brand-500/70"
           >
-            <Plus className="h-4 w-4 mr-1" />
-            새 문항
+            <Plus className="h-4 w-4 mr-1" />새 문항
           </Button>
         </div>
       </div>
     </div>
   );
 }
-
