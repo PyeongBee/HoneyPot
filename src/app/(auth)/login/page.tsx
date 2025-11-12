@@ -14,7 +14,11 @@ import { Suspense, useState, useTransition } from "react";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/editor";
+  const rawRedirect = searchParams.get("redirectTo");
+  const redirectTo =
+    rawRedirect && rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
+      ? rawRedirect
+      : "/editor";
 
   const { signInWithOAuth, refreshAuth } = useAuth();
   const { showError, showSuccess } = useToastStore();
