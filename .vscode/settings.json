@@ -87,7 +87,7 @@
   },
   
   // 터미널 설정
-  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
   
   // 기타 설정
   "files.associations": {
