@@ -3,20 +3,25 @@
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
 import { OAuthProvider } from "@/types/auth";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { normalizeInternalPath } from "@/utils/url";
 
 /**
- * 인증 관련 Hook
- * 클라이언트에서 인증 상태를 관리하고 OAuth 로그인을 처리합니다.
+ * 인증 관리 Hook
+ * - 클라이언트에서 인증 상태를 관리하고 OAuth 로그인을 처리합니다.
  */
 export function useAuth() {
   const { user, isLoading, isAuthenticated } = useAuthStore();
+  const router = useRouter();
+  const prevAuthenticated = useRef<boolean>(useAuthStore.getState().isAuthenticated);
+  const prompted = useRef<boolean>(false);
 
+  // 초기 세션 로드 및 상태 구독
   useEffect(() => {
     const supabase = createClient();
     const { setUser, setLoading } = useAuthStore.getState();
 
-    // 초기 세션 확인
     const initializeAuth = async () => {
       const {
         data: { session },
@@ -25,12 +30,11 @@ export function useAuth() {
       setLoading(false);
     };
 
-    initializeAuth();
+    void initializeAuth();
 
-    // 인증 상태 변경 리스너
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -38,15 +42,94 @@ export function useAuth() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 탭 포커스/가시성 변경 시 세션 동기화로 UI 최신화
+  useEffect(() => {
+    const supabase = createClient();
+    const { setUser } = useAuthStore.getState();
+
+    let syncing = false;
+    const askRelogin = async (): Promise<boolean> => {
+      const anyWindow: any = window as any;
+      const customConfirm = anyWindow?.__honeypotConfirm;
+      if (typeof customConfirm === "function") {
+        try {
+          const result = await customConfirm({
+            title: "세션이 만료되었습니다.",
+            message: "다시 로그인하시겠습니까?",
+            confirmText: "로그인",
+            cancelText: "취소",
+          });
+          return !!result;
+        } catch {
+          // fallback below
+        }
+      }
+      return window.confirm("세션이 만료되었습니다. 다시 로그인하시겠습니까?");
+    };
+
+    const sync = async () => {
+      if (syncing) return;
+      syncing = true;
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        const newAuthenticated = !!session?.user;
+        setUser(session?.user ?? null);
+
+        if (prevAuthenticated.current && !newAuthenticated && !prompted.current) {
+          prompted.current = true;
+          const shouldLogin = await askRelogin();
+          if (shouldLogin) {
+            const path = window.location.pathname || "/editor";
+            router.push(`/login?redirectTo=${encodeURIComponent(path)}`);
+          }
+        }
+
+        prevAuthenticated.current = newAuthenticated;
+      } finally {
+        syncing = false;
+      }
+    };
+
+    const onFocus = () => {
+      void sync();
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void sync();
+      }
+    };
+
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, [router]);
+
   /**
    * OAuth 로그인
    */
-  const signInWithOAuth = async (provider: OAuthProvider) => {
+  const signInWithOAuth = async (
+    provider: OAuthProvider,
+    nextPath?: string
+  ) => {
     const supabase = createClient();
+    const safeNext = normalizeInternalPath(nextPath, "");
+    const base = window.location.origin;
+    const callback = safeNext
+      ? `${base}/api/auth/callback?next=${encodeURIComponent(safeNext)}`
+      : `${base}/api/auth/callback`;
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
+        redirectTo: callback,
       },
     });
 
@@ -59,7 +142,6 @@ export function useAuth() {
 
   /**
    * 인증 상태 강제 새로고침
-   * 로그인/로그아웃 후 즉시 상태를 업데이트할 때 사용
    */
   const refreshAuth = async () => {
     const supabase = createClient();

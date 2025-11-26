@@ -64,20 +64,20 @@ export default function SettingsPage() {
     [showSuccess]
   );
 
-  // 공유 기록 삭제
+  // 로컬 공유 기록 삭제
   const handleClearHistory = useCallback(() => {
     showConfirm({
       message:
-        "모든 공유 기록을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.",
-      confirmText: "삭제",
+        "이 브라우저의 모든 로컬 공유 기록을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.",
+      confirmText: "로컬 기록 삭제",
       variant: "destructive",
       onConfirm: () => {
         try {
           clearShareHistory();
-          showSuccess("모든 공유 기록이 삭제되었습니다.");
+          showSuccess("로컬 공유 기록이 모두 삭제되었습니다.");
         } catch (error) {
-          console.error("공유 기록 삭제 실패:", error);
-          showError("공유 기록 삭제에 실패했습니다.");
+          console.error("로컬 공유 기록 삭제 실패:", error);
+          showError("로컬 공유 기록 삭제에 실패했습니다.");
         }
       },
     });
@@ -222,9 +222,9 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <Trash2 className="w-4 h-4" />
                   <div>
-                    <div className="text-sm font-medium">공유 기록 삭제</div>
+                    <div className="text-sm font-medium">로컬 공유 기록 삭제</div>
                     <div className="text-xs text-gray-500">
-                      모든 공유 기록을 삭제합니다
+                      이 브라우저에 저장된 공유 기록을 모두 삭제합니다
                     </div>
                   </div>
                 </div>
