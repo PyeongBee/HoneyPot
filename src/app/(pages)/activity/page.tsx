@@ -48,12 +48,16 @@ export default function ActivityPage() {
 
       if (isAuthenticated) {
         try {
-          const response = await fetch("/api/editor/shares?mine=1", {
-            cache: "no-store",
-            headers: {
-              "Cache-Control": "no-cache",
-            },
-          });
+          const response = await fetch(
+            `/api/editor/shares?mine=1&_t=${Date.now()}`,
+            {
+              cache: "no-store",
+              headers: {
+                "Cache-Control": "no-cache",
+                Pragma: "no-cache",
+              },
+            }
+          );
 
           if (response.ok) {
             const payload = await response.json();
@@ -142,6 +146,9 @@ export default function ActivityPage() {
         }
 
         showSuccess("공유 기록이 삭제되었습니다.");
+
+        // 서버와 동기화하기 위해 다시 로드
+        await loadShareHistory();
       } catch (error) {
         console.error("공유 기록 삭제 실패:", error);
         showError("공유 기록 삭제에 실패했습니다.");
