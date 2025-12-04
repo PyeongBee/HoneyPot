@@ -35,6 +35,19 @@ export async function GET(
 
   const supabase = await createClient();
 
+  // 인증 확인: 서버 저장 링크는 로그인 필요
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return NextResponse.json(
+      { error: "다문항 링크를 열려면 로그인이 필요합니다." },
+      { status: 401 }
+    );
+  }
+
   const { data, error } = await supabase
     .from("editor_shares")
     .select("id, payload, created_at")

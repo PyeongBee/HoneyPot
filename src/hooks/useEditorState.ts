@@ -178,6 +178,19 @@ export function useEditorState() {
       if (sharedId) {
         try {
           const response = await fetch(`/api/editor/shares/${sharedId}`);
+          
+          // 401 응답: 인증 필요
+          if (response.status === 401) {
+            const errorData = await response.json();
+            showError(errorData.error || "다문항 링크를 열려면 로그인이 필요합니다.");
+            
+            // 현재 URL을 redirectTo 파라미터로 전달하여 로그인 페이지로 이동
+            const currentUrl = window.location.href;
+            const loginUrl = `/login?redirectTo=${encodeURIComponent(currentUrl)}`;
+            window.location.href = loginUrl;
+            return false;
+          }
+          
           if (response.ok) {
             const payload = await response.json();
             const shareData: ShareData | undefined =
