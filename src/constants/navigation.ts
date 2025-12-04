@@ -2,12 +2,19 @@
  * 네비게이션 관련 상수 정의
  */
 
-import { Activity, FileText, LogIn, LogOut, Settings, User } from "lucide-react";
+import {
+  Activity,
+  FileText,
+  LogIn,
+  LogOut,
+  Settings,
+  User,
+} from "lucide-react";
 
 export const NAVIGATION = {
   LOGO_PATH: "/logo_Bee_lsh_clear_gra.png",
   LOGO_ALT: "로고",
-  APP_NAME: "평비의 꿀단지",
+  APP_NAME: "Waggle",
 } as const;
 
 // 메뉴 라벨 상수

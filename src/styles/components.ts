@@ -302,7 +302,7 @@ export const sidebarStyles = {
     expanded: "w-64",
   },
   logo: {
-    size: 40,
+    size: 46,
   },
 } as const;
 

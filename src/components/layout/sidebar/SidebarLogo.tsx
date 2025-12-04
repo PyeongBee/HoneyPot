@@ -20,7 +20,10 @@ const SidebarLogo: React.FC<SidebarLogoProps> = ({ isCollapsed }) => {
             className="object-contain"
             priority
           />
-          <span className="font-semibold text-amber-800 dark:text-amber-300 text-base logo-text truncate">
+          <span
+            className="font-semibold text-black-800 dark:text-amber-300 logo-text truncate text-2xl leading-12"
+            style={{ fontFamily: "'Pacifico', cursive" }}
+          >
             {NAVIGATION.APP_NAME}
           </span>
         </div>

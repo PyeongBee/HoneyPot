@@ -75,7 +75,7 @@ const Toast: React.FC<ToastProps> = ({
       )}
     >
       {getIcon()}
-      <span className="flex-1 text-sm font-medium">
+      <span className="flex-1 text-sm font-medium dark:text-black">
         {message}
       </span>
       <button

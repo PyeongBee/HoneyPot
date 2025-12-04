@@ -21,7 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   return (
     <div className={getSidebarClasses(isCollapsed)}>
-      <div className="border-b border-gray-200 dark:border-gray-700 sidebar-logo px-2">
+      <div className="sidebar-logo px-2">
         <SidebarLogo isCollapsed={isCollapsed} />
       </div>
 
