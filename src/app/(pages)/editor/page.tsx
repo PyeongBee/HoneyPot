@@ -1,5 +1,6 @@
 "use client";
 
+import Sidebar from "@/components/layout/Sidebar";
 import {
   LazyDiffViewer,
   LazyEditor,
@@ -19,7 +20,8 @@ import { useSpellCheckStore } from "@/stores/spellCheckStore";
 import { useToastStore } from "@/stores/toastStore";
 import { SHARE_DATA_VERSION } from "@/types/editor";
 import { getTextStats } from "@/utils/textUtils";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import EditorMobileModeNav from "./_components/layout/EditorMobileModeNav";
 import EditorSidebar from "./_components/layout/EditorSidebar";
 import EditorUpperHeader from "./_components/layout/EditorUpperHeader";
 import QuestionEditor from "./_components/QuestionEditor";
@@ -81,8 +83,10 @@ export default function EditorPage() {
 
   // UI 상태
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
-  const [lastScrollY, setLastScrollY] = useState<number>(0);
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] =
+    useState<boolean>(false);
+  const lastScrollYRef = useRef<number>(0);
 
   const hasUnsavedChanges = useMemo(
     () =>
@@ -131,15 +135,29 @@ export default function EditorPage() {
 
   // 헤더 표시/숨김 (스크롤)
   useEffect(() => {
+    lastScrollYRef.current =
+      window.pageYOffset || document.documentElement.scrollTop || 0;
+
+    let ticking = false;
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setIsHeaderVisible(currentScrollY < lastScrollY || currentScrollY < 100);
-      setLastScrollY(currentScrollY);
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const currentScrollY =
+          window.pageYOffset || document.documentElement.scrollTop || 0;
+        const lastY = lastScrollYRef.current;
+        const isNearTop = currentScrollY < 80;
+        const isScrollingUp = currentScrollY < lastY;
+
+        setIsHeaderVisible(isNearTop || isScrollingUp);
+        lastScrollYRef.current = currentScrollY;
+        ticking = false;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   // 모드 변경 핸들러
   const handleModeChange = useCallback(
@@ -203,6 +221,28 @@ export default function EditorPage() {
   const handleCloseShareModal = useCallback(() => {
     setIsShareModalOpen(false);
   }, []);
+
+  const handleOpenMobileSidebar = useCallback(() => {
+    setIsMobileSidebarOpen(true);
+  }, []);
+
+  const handleCloseMobileSidebar = useCallback(() => {
+    setIsMobileSidebarOpen(false);
+  }, []);
+
+  // 모바일 사이드바 오버레이 시 스크롤 잠금
+  useEffect(() => {
+    if (!isMobile) return;
+    const originalOverflow = document.body.style.overflow;
+    if (isMobileSidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = originalOverflow;
+    }
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isMobileSidebarOpen, isMobile]);
 
   const handleSelectQuestion = useCallback(
     (questionId: string) => {
@@ -277,14 +317,45 @@ export default function EditorPage() {
   const hasRightColumn = showCheckSidebar || showResultSidebar;
 
   return (
-    <div className="min-h-screen dark:bg-gray-900 pb-16 md:pb-0">
+    <div
+      className={`min-h-screen dark:bg-gray-900 ${
+        isMobile ? "pb-28" : "pb-16 md:pb-0"
+      }`}
+    >
       <EditorUpperHeader
         viewMode={viewMode}
         isMobile={isMobile}
         isCollapsed={isCollapsed}
         isHeaderVisible={isHeaderVisible}
         onModeChange={handleModeChange}
+        onMobileMenuClick={handleOpenMobileSidebar}
+        onShareClick={handleShareButtonClick}
       />
+
+      {/* 모바일 사이드바 오버레이 (항상 렌더 후 트랜지션) */}
+      {isMobile && (
+        <div
+          className={`fixed inset-0 z-[1200] bg-black/45 backdrop-blur-[1px] transition-opacity duration-200 ${
+            isMobileSidebarOpen
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
+          }`}
+          onClick={handleCloseMobileSidebar}
+        >
+          <div
+            className={`absolute inset-y-0 left-0 w-64 max-w-[80vw] bg-white dark:bg-gray-900 shadow-xl transition-transform duration-200 ease-out ${
+              isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+            onClick={e => e.stopPropagation()}
+          >
+            <Sidebar
+              isCollapsed={false}
+              onToggle={handleCloseMobileSidebar}
+              onNavigate={handleCloseMobileSidebar}
+            />
+          </div>
+        </div>
+      )}
 
       {isAuthenticated && (
         <div className="mt-20">
@@ -363,7 +434,16 @@ export default function EditorPage() {
         </div>
       </div>
 
-      <ShareButton isMobile={isMobile} onClick={handleShareButtonClick} />
+      {!isMobile && (
+        <ShareButton isMobile={isMobile} onClick={handleShareButtonClick} />
+      )}
+
+      {isMobile && (
+        <EditorMobileModeNav
+          viewMode={viewMode}
+          onModeChange={handleModeChange}
+        />
+      )}
 
       <ShareModal
         isOpen={isShareModalOpen}
