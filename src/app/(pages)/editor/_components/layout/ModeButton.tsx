@@ -1,11 +1,14 @@
 import React from "react";
 import { cn } from "../../../../../styles/components";
 
+type ModeButtonVariant = "text" | "pill";
+
 interface ModeButtonProps {
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
   className?: string;
+  variant?: ModeButtonVariant;
   role?: string;
   "aria-selected"?: boolean;
   "aria-controls"?: string;
@@ -13,18 +16,36 @@ interface ModeButtonProps {
 }
 
 export const ModeButton: React.FC<ModeButtonProps> = React.memo(
-  function ModeButton({ active, onClick, children, className, ...props }) {
+  function ModeButton({
+    active,
+    onClick,
+    children,
+    className,
+    variant = "text",
+    ...props
+  }) {
+    const textVariant = cn(
+      "px-1 md:px-2 py-0.5 text-sm md:text-base",
+      "transition-colors duration-200",
+      "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
+      active
+        ? "font-bold text-amber-500 dark:text-gray-100"
+        : "font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+    );
+
+    const pillVariant = cn(
+      "px-4 py-1 rounded-full border",
+      "transition-colors duration-200",
+      "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
+      active
+        ? "bg-brand-50 text-brand-700 border-brand-200"
+        : "bg-transparent text-gray-700 border-gray-300 hover:text-gray-900 hover:border-gray-400"
+    );
+
     return (
       <button
         className={cn(
-          "px-4 py-1 border-2 text-white rounded-full",
-          "font-medium transition-all duration-300 ease-out",
-          "transform hover:scale-105 active:scale-95",
-          "hover:shadow-lg hover:shadow-white/20",
-          "focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent",
-          active
-            ? "bg-white/20 border-white backdrop-blur-sm shadow-md hover:bg-white/30 hover:border-white"
-            : "bg-transparent border-white/40 hover:bg-white/10 hover:border-white/70",
+          variant === "pill" ? pillVariant : textVariant,
           className
         )}
         onClick={onClick}

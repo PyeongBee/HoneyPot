@@ -11,13 +11,13 @@ import { useEditorState } from "@/hooks/useEditorState";
 import { useShareFeature } from "@/hooks/useShareFeature";
 import { useTextCorrections } from "@/hooks/useTextCorrections";
 import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
-import { SHARE_DATA_VERSION } from "@/types/editor";
 import { useAuthStore } from "@/stores/authStore";
 import { useConfirmStore } from "@/stores/confirmStore";
 import { useDeviceStore } from "@/stores/deviceStore";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { useSpellCheckStore } from "@/stores/spellCheckStore";
 import { useToastStore } from "@/stores/toastStore";
+import { SHARE_DATA_VERSION } from "@/types/editor";
 import { getTextStats } from "@/utils/textUtils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import EditorSidebar from "./_components/layout/EditorSidebar";
@@ -109,8 +109,9 @@ export default function EditorPage() {
     }
 
     const combinedContent = questions
-      .map(question =>
-        `${question.questionText ?? ""}${question.originalText ?? ""}${question.editedText ?? ""}`
+      .map(
+        question =>
+          `${question.questionText ?? ""}${question.originalText ?? ""}${question.editedText ?? ""}`
       )
       .join(" ")
       .trim();
@@ -270,8 +271,13 @@ export default function EditorPage() {
     return null;
   }
 
+  const checkSidebar = renderSidebar();
+  const showCheckSidebar = Boolean(checkSidebar);
+  const showResultSidebar = viewMode === "result";
+  const hasRightColumn = showCheckSidebar || showResultSidebar;
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-16 md:pb-0">
+    <div className="min-h-screen dark:bg-gray-900 pb-16 md:pb-0">
       <EditorUpperHeader
         viewMode={viewMode}
         isMobile={isMobile}
@@ -298,12 +304,18 @@ export default function EditorPage() {
         questionCharLimit={questionCharLimit}
         onQuestionChange={handleQuestionChange}
         onQuestionLimitChange={handleQuestionLimitChange}
+        originalStats={originalStats}
+        editedStats={editedStats}
         containerClassName={isAuthenticated ? "mt-4" : undefined}
       />
 
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-3">
-          <div className="md:col-span-3">
+        <div
+          className={`grid grid-cols-1 ${
+            hasRightColumn ? "md:grid-cols-4" : "md:grid-cols-1"
+          } gap-2 mt-3`}
+        >
+          <div className={hasRightColumn ? "md:col-span-3" : "md:col-span-4"}>
             {viewMode === "original" && (
               <LazyOriginalEditor
                 originalText={originalText}
@@ -331,18 +343,23 @@ export default function EditorPage() {
             )}
           </div>
 
-          <div className="md:col-span-1">
-            <EditorSidebar
-              viewMode={viewMode}
-              memos={memos}
-              originalStats={originalStats}
-              editedStats={editedStats}
-              onDeleteMemo={deleteMemo}
-              onMemoClick={handleMemoClick}
-              onMemoHover={handleMemoHover}
-              renderCheckSidebar={renderSidebar()}
-            />
-          </div>
+          {hasRightColumn && (
+            <div className="md:col-span-1">
+              {showCheckSidebar ? (
+                <div className="sticky top-24">{checkSidebar}</div>
+              ) : (
+                <EditorSidebar
+                  viewMode={viewMode}
+                  memos={memos}
+                  originalStats={originalStats}
+                  editedStats={editedStats}
+                  onDeleteMemo={deleteMemo}
+                  onMemoClick={handleMemoClick}
+                  onMemoHover={handleMemoHover}
+                />
+              )}
+            </div>
+          )}
         </div>
       </div>
 
