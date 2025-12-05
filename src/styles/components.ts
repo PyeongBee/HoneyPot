@@ -294,7 +294,7 @@ export function getSidebarMenuItemClasses(
 // 사이드바 스타일 시스템
 export const sidebarStyles = {
   base: [
-    "bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700",
+    "bg-amber-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700",
     "transition-all duration-300 relative h-full flex flex-col",
   ],
   widths: {
@@ -327,7 +327,7 @@ export const dropdownStyles = {
   },
   menuItem: [
     "flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300",
-    "hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
+    "hover:bg-amber-100 dark:hover:bg-gray-700 transition-colors",
   ],
   divider: "border-t border-gray-200 dark:border-gray-600 my-1",
   arrow: {
@@ -369,7 +369,7 @@ export const mobileNavStyles = {
 export const sidebarMenuItemStyles = {
   base: [
     "flex items-center rounded-lg transition-all duration-200 w-full text-left",
-    "hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105",
+    "hover:bg-amber-100 dark:hover:bg-gray-800 hover:scale-105",
   ],
   collapsed: "justify-center h-10 px-2",
   expanded: "h-10 px-3",

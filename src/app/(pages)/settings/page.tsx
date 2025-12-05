@@ -120,7 +120,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen dark:bg-gray-900 py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* 헤더 */}
         <div className="mb-8">
@@ -222,7 +222,9 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <Trash2 className="w-4 h-4" />
                   <div>
-                    <div className="text-sm font-medium">로컬 공유 기록 삭제</div>
+                    <div className="text-sm font-medium">
+                      로컬 공유 기록 삭제
+                    </div>
                     <div className="text-xs text-gray-500">
                       이 브라우저에 저장된 공유 기록을 모두 삭제합니다
                     </div>

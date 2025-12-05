@@ -215,7 +215,7 @@ export default function ActivityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen dark:bg-gray-900 py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* 헤더 */}
         <div className="mb-8">

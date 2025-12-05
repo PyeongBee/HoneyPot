@@ -1,6 +1,10 @@
 "use client";
 
-import { MENU_LABELS, MORE_MENU_ITEMS, MORE_MENU_ITEMS_GUEST } from "@/constants/navigation";
+import {
+  MENU_LABELS,
+  MORE_MENU_ITEMS,
+  MORE_MENU_ITEMS_GUEST,
+} from "@/constants/navigation";
 import { signOut } from "@/lib/actions/auth";
 import { useAuthStore } from "@/stores/authStore";
 import { useToastStore } from "@/stores/toastStore";
@@ -13,7 +17,10 @@ interface UserProfileProps {
   onNavigate?: (href: string) => void;
 }
 
-export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProps) {
+export default function UserProfile({
+  isCollapsed,
+  onNavigate,
+}: UserProfileProps) {
   const router = useRouter();
   const { user, isAuthenticated, reset } = useAuthStore();
   const { addToast } = useToastStore();
@@ -50,7 +57,7 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
         <div className="relative">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${
+            className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${
               isCollapsed ? "justify-center" : ""
             }`}
             title={MENU_LABELS.MORE}
@@ -58,7 +65,9 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
             <Menu className="w-5 h-5 flex-shrink-0" />
             {!isCollapsed && (
               <>
-                <span className="flex-1 text-left truncate min-w-0">{MENU_LABELS.MORE}</span>
+                <span className="flex-1 text-left truncate min-w-0">
+                  {MENU_LABELS.MORE}
+                </span>
                 <ChevronDown
                   className={`w-4 h-4 transition-transform flex-shrink-0 ${
                     isOpen ? "rotate-180" : ""
@@ -73,8 +82,9 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
             <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
               {MORE_MENU_ITEMS_GUEST.map((item, index) => {
                 const IconComponent = item.icon;
-                const isLastBeforeDivider = index === MORE_MENU_ITEMS_GUEST.length - 2;
-                
+                const isLastBeforeDivider =
+                  index === MORE_MENU_ITEMS_GUEST.length - 2;
+
                 return (
                   <div key={item.href}>
                     <button
@@ -86,7 +96,7 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
                           router.push(item.href);
                         }
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-gray-700 transition-colors"
                     >
                       <IconComponent className="w-4 h-4" />
                       <span>{item.label}</span>
@@ -105,8 +115,9 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
             <div className="absolute bottom-0 left-full ml-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50 min-w-[200px]">
               {MORE_MENU_ITEMS_GUEST.map((item, index) => {
                 const IconComponent = item.icon;
-                const isLastBeforeDivider = index === MORE_MENU_ITEMS_GUEST.length - 2;
-                
+                const isLastBeforeDivider =
+                  index === MORE_MENU_ITEMS_GUEST.length - 2;
+
                 return (
                   <div key={item.href}>
                     <button
@@ -118,7 +129,7 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
                           router.push(item.href);
                         }
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-gray-700 transition-colors"
                     >
                       <IconComponent className="w-4 h-4" />
                       <span>{item.label}</span>
@@ -168,7 +179,7 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${
+          className={`w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${
             isCollapsed ? "justify-center" : ""
           }`}
           title={displayName}
@@ -200,9 +211,9 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
         {/* 드롭다운 메뉴 */}
         {isOpen && !isCollapsed && (
           <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
-            {MORE_MENU_ITEMS.map((item) => {
+            {MORE_MENU_ITEMS.map(item => {
               const IconComponent = item.icon;
-              
+
               return (
                 <button
                   key={item.href}
@@ -214,7 +225,7 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
                       router.push(item.href);
                     }
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <IconComponent className="w-4 h-4" />
                   <span>{item.label}</span>
@@ -243,9 +254,9 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
                 {user.email}
               </div>
             </div>
-            {MORE_MENU_ITEMS.map((item) => {
+            {MORE_MENU_ITEMS.map(item => {
               const IconComponent = item.icon;
-              
+
               return (
                 <button
                   key={item.href}
@@ -257,7 +268,7 @@ export default function UserProfile({ isCollapsed, onNavigate }: UserProfileProp
                       router.push(item.href);
                     }
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <IconComponent className="w-4 h-4" />
                   <span>{item.label}</span>

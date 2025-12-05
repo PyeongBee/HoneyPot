@@ -84,7 +84,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   return (
     <AuthProvider>
-      <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex h-screen dark:bg-gray-900">
         {/* 데스크톱 사이드바 - 클라이언트에서만 표시, 인증 페이지에서는 숨김 */}
         {!isMobile && isClient && !isAuthPage && (
           <div className="relative">

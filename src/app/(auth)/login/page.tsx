@@ -71,7 +71,7 @@ function LoginForm() {
 
   // 로그인 페이지
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center dark:bg-gray-900 px-4 py-12">
       <div className="max-w-md w-full space-y-8">
         {/* 로고 */}
         <div className="text-center">

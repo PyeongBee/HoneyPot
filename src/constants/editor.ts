@@ -5,7 +5,7 @@
 export const DEFAULT_CHAR_LIMIT = 500;
 export const MIN_CHAR_LIMIT = 100;
 export const MAX_CHAR_LIMIT = 2000;
-export const CHAR_LIMIT_STEP = 50;
+export const CHAR_LIMIT_STEP = 100;
 
 export const COPY_SUCCESS_DURATION = 2000; // 2초
 export const LONG_PRESS_DURATION = 500; // 0.5초

@@ -8,7 +8,12 @@ import {
   LONG_PRESS_DURATION,
   TOOLTIP_DISPLAY_DURATION,
 } from "../../constants/editor";
-import { MENU_ITEMS, MENU_LABELS, MORE_MENU_ITEMS, MORE_MENU_ITEMS_GUEST } from "../../constants/navigation";
+import {
+  MENU_ITEMS,
+  MENU_LABELS,
+  MORE_MENU_ITEMS,
+  MORE_MENU_ITEMS_GUEST,
+} from "../../constants/navigation";
 import { signOut } from "../../lib/actions/auth";
 import { useAuthStore } from "../../stores/authStore";
 import { useConfirmStore } from "../../stores/confirmStore";
@@ -187,14 +192,14 @@ export default function MobileNavigation() {
               )}
 
               {/* 메뉴 아이템 */}
-              {(user ? MORE_MENU_ITEMS : MORE_MENU_ITEMS_GUEST).map((item) => {
+              {(user ? MORE_MENU_ITEMS : MORE_MENU_ITEMS_GUEST).map(item => {
                 const IconComponent = item.icon;
-                
+
                 return (
                   <button
                     key={item.href}
                     onClick={() => handleProfileMenuClick(item.href)}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-gray-700 transition-colors"
                   >
                     <IconComponent className="w-4 h-4" />
                     <span>{item.label}</span>

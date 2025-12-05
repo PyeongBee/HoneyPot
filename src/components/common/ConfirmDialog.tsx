@@ -60,7 +60,7 @@ const ConfirmDialog: React.FC = () => {
         {/* Header */}
         <div className="flex items-start justify-between p-6 pb-4">
           <div className="flex items-start gap-3 flex-1">
-            {dialog.variant === 'destructive' && (
+            {dialog.variant === "destructive" && (
               <div className="flex-shrink-0 mt-0.5">
                 <AlertCircle className="w-6 h-6 text-error-500" />
               </div>
@@ -81,16 +81,14 @@ const ConfirmDialog: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-900/50">
-          <Button
-            variant="outline"
-            size="md"
-            onClick={handleCancel}
-          >
+        <div className="flex items-center justify-end gap-3 px-6 py-4 dark:bg-gray-900/50">
+          <Button variant="outline" size="md" onClick={handleCancel}>
             {dialog.cancelText}
           </Button>
           <Button
-            variant={dialog.variant === 'destructive' ? 'destructive' : 'default'}
+            variant={
+              dialog.variant === "destructive" ? "destructive" : "default"
+            }
             size="md"
             onClick={handleConfirm}
           >
@@ -103,4 +101,3 @@ const ConfirmDialog: React.FC = () => {
 };
 
 export default ConfirmDialog;
-
