@@ -2,10 +2,13 @@
 
 import { Button } from "@/components/common/Button";
 import { Card, CardDescription, CardTitle } from "@/components/common/Card";
+import PageTopBar from "@/components/layout/PageTopBar";
+import { useDeviceStore } from "@/stores/deviceStore";
 import ToggleSwitch from "@/components/common/ToggleSwitch";
 import { signOut } from "@/lib/actions/auth";
 import { useAuthStore } from "@/stores/authStore";
 import { useConfirmStore } from "@/stores/confirmStore";
+import { useSidebarStore } from "@/stores/sidebarStore";
 import { useToastStore } from "@/stores/toastStore";
 import { clearShareHistory } from "@/utils/shareHistoryUtils";
 import { Database, Moon, Sun, Trash2, User } from "lucide-react";
@@ -17,6 +20,28 @@ export default function SettingsPage() {
   const { user } = useAuthStore();
   const { showSuccess, showError } = useToastStore();
   const { showConfirm } = useConfirmStore();
+  const { isMobile, checkDevice } = useDeviceStore();
+  const { isCollapsed, isMobileOpen, openMobileSidebar } = useSidebarStore();
+
+  useEffect(() => {
+    checkDevice();
+    const onResize = () => checkDevice();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [checkDevice]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const originalOverflow = document.body.style.overflow;
+    if (isMobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = originalOverflow;
+    }
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isMobileOpen, isMobile]);
 
   // 설정 상태들
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -120,17 +145,15 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen dark:bg-gray-900 py-8">
+    <div className="min-h-screen dark:bg-gray-900 pb-8 pt-24 sm:pt-28">
+      <PageTopBar
+        title="설정"
+        isMobile={isMobile}
+        isCollapsed={isCollapsed}
+        onMobileMenuClick={openMobileSidebar}
+      />
+
       <div className="max-w-4xl mx-auto px-4">
-        {/* 헤더 */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            설정
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            계정 및 앱 설정을 관리하세요
-          </p>
-        </div>
 
         <div className="space-y-6">
           {/* 계정 정보 */}

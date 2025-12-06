@@ -9,7 +9,6 @@ import { ToastData, useToastStore } from "../../stores/toastStore";
 import AuthProvider from "../auth/AuthProvider";
 import ConfirmDialog from "../common/ConfirmDialog";
 import Toast from "../common/Toast";
-import MobileNavigation from "./MobileNavigation";
 import Sidebar from "./Sidebar";
 
 interface LayoutWrapperProps {
@@ -17,7 +16,13 @@ interface LayoutWrapperProps {
 }
 
 export default function LayoutWrapper({ children }: LayoutWrapperProps) {
-  const { isCollapsed, toggleSidebar } = useSidebarStore();
+  const {
+    isCollapsed,
+    toggleSidebar,
+    isMobileOpen,
+    openMobileSidebar,
+    closeMobileSidebar,
+  } = useSidebarStore();
   const { showConfirm } = useConfirmStore();
   const { toasts, removeToast } = useToastStore();
   const pathname = usePathname();
@@ -27,6 +32,10 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   // 에디터 페이지에서 unsaved changes 확인
   const handleNavigation = (href: string) => {
+    if (isMobileOpen) {
+      closeMobileSidebar();
+    }
+
     if (pathname === "/editor") {
       // 에디터 페이지에서 나갈 때 확인
       const editorContent = sessionStorage.getItem("editorContent");
@@ -85,6 +94,31 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   return (
     <AuthProvider>
       <div className="flex h-screen dark:bg-gray-900">
+        {/* 모바일 사이드바 오버레이 (열림/닫힘 트랜지션) */}
+        {isMobile && isClient && !isAuthPage && (
+          <>
+            <div
+              className={`fixed inset-0 z-[1200] bg-black/40 transition-opacity duration-200 ${
+                isMobileOpen
+                  ? "opacity-100 pointer-events-auto"
+                  : "opacity-0 pointer-events-none"
+              }`}
+              onClick={closeMobileSidebar}
+            />
+            <div
+              className={`fixed inset-y-0 left-0 z-[1300] w-72 max-w-[80vw] transform transition-transform duration-200 ${
+                isMobileOpen ? "translate-x-0" : "-translate-x-full"
+              }`}
+            >
+              <Sidebar
+                isCollapsed={false}
+                onToggle={isMobile ? closeMobileSidebar : toggleSidebar}
+                onNavigate={handleNavigation}
+              />
+            </div>
+          </>
+        )}
+
         {/* 데스크톱 사이드바 - 클라이언트에서만 표시, 인증 페이지에서는 숨김 */}
         {!isMobile && isClient && !isAuthPage && (
           <div className="relative">
@@ -98,13 +132,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
         {/* 메인 컨텐츠 영역 */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <main
-            className={`flex-1 overflow-auto ${
-              isMobile && !isAuthPage
-                ? "pb-16" // 모바일에서는 하단 네비게이션 공간 확보 (인증 페이지 제외)
-                : ""
-            }`}
-          >
+          <main className={`flex-1 overflow-auto`}>
             <div
               className={`mx-auto ${isMobile ? "w-full px-4" : "w-full px-6"}`}
             >
@@ -112,9 +140,6 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
             </div>
           </main>
         </div>
-
-        {/* 모바일 하단 네비게이션 - 인증 페이지에서는 숨김 */}
-        {isMobile && !isAuthPage && <MobileNavigation />}
       </div>
 
       {/* 컨펌 다이얼로그 */}

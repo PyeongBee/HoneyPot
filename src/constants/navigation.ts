@@ -8,6 +8,7 @@ import {
   LogIn,
   LogOut,
   Settings,
+  Share2,
   User,
 } from "lucide-react";
 
@@ -20,6 +21,7 @@ export const NAVIGATION = {
 // 메뉴 라벨 상수
 export const MENU_LABELS = {
   EDITOR: "자소서 에디터",
+  SHARE: "자소서 공유",
   ACTIVITY: "내 활동",
   SETTINGS: "설정",
   LOGIN: "로그인",
@@ -30,6 +32,7 @@ export const MENU_LABELS = {
 // 메인 메뉴 아이템
 export const MENU_ITEMS = [
   { icon: FileText, label: MENU_LABELS.EDITOR, href: "/editor" },
+  { icon: Share2, label: MENU_LABELS.SHARE, href: "/share" },
   // { icon: UserSearch, label: "스터디 목록", href: "/study" },
   // { icon: CircleUserRound, label: "프로필", href: "/profile" },
 ] as const;

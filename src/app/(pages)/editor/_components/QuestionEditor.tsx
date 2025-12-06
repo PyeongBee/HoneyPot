@@ -31,9 +31,7 @@ export default function QuestionEditor({
   const stats = viewMode === "original" ? originalStats : editedStats;
 
   return (
-    <div
-      className={clsx("pt-4 dark:bg-gray-800 ", containerClassName ?? "mt-14")}
-    >
+    <div className={clsx("dark:bg-gray-800", containerClassName ?? "mt-14")}>
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-2">
         {viewMode === "original" ? (
           <div className="lg:col-span-3">

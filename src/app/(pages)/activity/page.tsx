@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
+import PageShell from "@/components/layout/PageShell";
 import { useAuthStore } from "@/stores/authStore";
 import { useConfirmStore } from "@/stores/confirmStore";
 import { useToastStore } from "@/stores/toastStore";
@@ -215,92 +216,135 @@ export default function ActivityPage() {
   }
 
   return (
-    <div className="min-h-screen dark:bg-gray-900 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* 헤더 */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            내 활동
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            공유한 자소서 작업 기록을 확인하고 관리하세요
-          </p>
+    <PageShell
+      title="내 활동"
+      className="min-h-screen dark:bg-gray-900 pb-8"
+      contentClassName="max-w-4xl mx-auto px-4"
+    >
+      {/* 공유 기록 목록 */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            공유 기록
+          </h2>
+          {hasLocalEntries && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleClearAll}
+              className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              ?? ?? ?? ??
+            </Button>
+          )}
         </div>
 
-        {/* 공유 기록 목록 */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              공유 기록
-            </h2>
-            {hasLocalEntries && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearAll}
-                className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                ?? ?? ?? ??
-              </Button>
-            )}
+        {shareHistory.length === 0 ? (
+          <div className="text-center py-12">
+            <Share2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              공유 기록이 없습니다
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              에디터에서 자소서를 공유하면 여기에 기록이 나타납니다
+            </p>
           </div>
+        ) : (
+          <div className="space-y-4">
+            {shareHistory.map(item => {
+              const previewText = getSharePreview(item.shareData);
+              const sourceLabel = item.source === "remote" ? "서버" : "로컬";
+              const sourceClassName =
+                item.source === "remote"
+                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200"
+                  : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200";
 
-          {shareHistory.length === 0 ? (
-            <div className="text-center py-12">
-              <Share2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                공유 기록이 없습니다
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                에디터에서 자소서를 공유하면 여기에 기록이 나타납니다
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {shareHistory.map(item => {
-                const previewText = getSharePreview(item.shareData);
-                const sourceLabel = item.source === "remote" ? "서버" : "로컬";
-                const sourceClassName =
-                  item.source === "remote"
-                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200"
-                    : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200";
+              return (
+                <div
+                  key={item.id}
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  {/* 데스크톱: 1행 5열 구조 */}
+                  <div className="hidden md:grid md:grid-cols-5 gap-4 items-center mb-3">
+                    {/* 1-3열: 질문 (3열 차지) */}
+                    <div className="col-span-3">
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate flex items-center gap-2">
+                        <span className="truncate">{item.title}</span>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${sourceClassName}`}
+                        >
+                          {sourceLabel}
+                        </span>
+                      </h3>
+                    </div>
 
-                return (
-                  <div
-                    key={item.id}
-                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                  >
-                    {/* 데스크톱: 1행 5열 구조 */}
-                    <div className="hidden md:grid md:grid-cols-5 gap-4 items-center mb-3">
-                      {/* 1-3열: 질문 (3열 차지) */}
+                    {/* 4열: 시간 (우측 정렬) */}
+                    <div className="col-span-1 text-right">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {formatDate(item.createdAt)}
+                      </p>
+                    </div>
+
+                    {/* 5열: 버튼들 */}
+                    <div className="col-span-1 flex items-center justify-end space-x-1">
+                      <div title="링크 복사">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCopyUrl(item.url)}
+                        >
+                          <Share2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div title="새 탭에서 열기">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => window.open(item.url, "_blank")}
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div title="삭제">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteItem(item)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 모바일: 2행 구조 */}
+                  <div className="md:hidden mb-3">
+                    {/* 1행: 질문 3열 + 버튼들 2열 */}
+                    <div className="grid grid-cols-5 gap-2 items-center mb-2">
+                      {/* 질문 (3열) */}
                       <div className="col-span-3">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate flex items-center gap-2">
+                        <h3 className="text-base font-medium text-gray-900 dark:text-white truncate flex items-center gap-2">
                           <span className="truncate">{item.title}</span>
                           <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${sourceClassName}`}
+                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${sourceClassName}`}
                           >
                             {sourceLabel}
                           </span>
                         </h3>
                       </div>
 
-                      {/* 4열: 시간 (우측 정렬) */}
-                      <div className="col-span-1 text-right">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {formatDate(item.createdAt)}
-                        </p>
-                      </div>
-
-                      {/* 5열: 버튼들 */}
-                      <div className="col-span-1 flex items-center justify-end space-x-1">
+                      {/* 버튼들 (2열) */}
+                      <div className="col-span-2 flex items-center justify-end space-x-1">
                         <div title="링크 복사">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleCopyUrl(item.url)}
+                            className="p-1.5"
                           >
-                            <Share2 className="w-4 h-4" />
+                            <Share2 className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                         <div title="새 탭에서 열기">
@@ -308,8 +352,9 @@ export default function ActivityPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => window.open(item.url, "_blank")}
+                            className="p-1.5"
                           >
-                            <ExternalLink className="w-4 h-4" />
+                            <ExternalLink className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                         <div title="삭제">
@@ -317,95 +362,43 @@ export default function ActivityPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteItem(item)}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-red-600 hover:text-red-700 p-1.5"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                         </div>
                       </div>
                     </div>
 
-                    {/* 모바일: 2행 구조 */}
-                    <div className="md:hidden mb-3">
-                      {/* 1행: 질문 3열 + 버튼들 2열 */}
-                      <div className="grid grid-cols-5 gap-2 items-center mb-2">
-                        {/* 질문 (3열) */}
-                        <div className="col-span-3">
-                          <h3 className="text-base font-medium text-gray-900 dark:text-white truncate flex items-center gap-2">
-                            <span className="truncate">{item.title}</span>
-                            <span
-                              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${sourceClassName}`}
-                            >
-                              {sourceLabel}
-                            </span>
-                          </h3>
-                        </div>
-
-                        {/* 버튼들 (2열) */}
-                        <div className="col-span-2 flex items-center justify-end space-x-1">
-                          <div title="링크 복사">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleCopyUrl(item.url)}
-                              className="p-1.5"
-                            >
-                              <Share2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                          <div title="새 탭에서 열기">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => window.open(item.url, "_blank")}
-                              className="p-1.5"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                          <div title="삭제">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteItem(item)}
-                              className="text-red-600 hover:text-red-700 p-1.5"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* 2행: 시간 정보 */}
-                      <div className="flex justify-start">
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          {formatDate(item.createdAt)}
-                        </p>
-                      </div>
+                    {/* 2행: 시간 정보 */}
+                    <div className="flex justify-start">
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {formatDate(item.createdAt)}
+                      </p>
                     </div>
-
-                    {/* 2행: 수정된 결과 (전체 너비) */}
-                    {previewText && (
-                      <div className="w-full p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                        <p
-                          className="text-sm text-gray-700 dark:text-gray-300 overflow-hidden"
-                          style={{
-                            display: "-webkit-box",
-                            WebkitLineClamp: 3,
-                            WebkitBoxOrient: "vertical",
-                          }}
-                        >
-                          {previewText}
-                        </p>
-                      </div>
-                    )}
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </Card>
-      </div>
-    </div>
+
+                  {/* 2행: 수정된 결과 (전체 너비) */}
+                  {previewText && (
+                    <div className="w-full p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                      <p
+                        className="text-sm text-gray-700 dark:text-gray-300 overflow-hidden"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        {previewText}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Card>
+    </PageShell>
   );
 }

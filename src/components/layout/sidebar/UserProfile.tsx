@@ -8,6 +8,7 @@ import {
 import { signOut } from "@/lib/actions/auth";
 import { useAuthStore } from "@/stores/authStore";
 import { useToastStore } from "@/stores/toastStore";
+import { useSidebarStore } from "@/stores/sidebarStore";
 import { ChevronDown, LogOut, Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -24,6 +25,7 @@ export default function UserProfile({
   const router = useRouter();
   const { user, isAuthenticated, reset } = useAuthStore();
   const { addToast } = useToastStore();
+  const { closeMobileSidebar } = useSidebarStore();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -149,6 +151,7 @@ export default function UserProfile({
 
   const handleLogout = async () => {
     try {
+      closeMobileSidebar();
       // authStore 상태 초기화 (토스트 스토어도 함께 초기화됨)
       reset();
       // 로그아웃 성공 토스트 추가

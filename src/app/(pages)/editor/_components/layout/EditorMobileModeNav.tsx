@@ -1,7 +1,6 @@
 "use client";
 
 import { ViewMode } from "@/types/editor";
-import React from "react";
 import { ModeButton } from "./ModeButton";
 
 interface EditorMobileModeNavProps {
@@ -38,4 +37,3 @@ export default function EditorMobileModeNav({
     </nav>
   );
 }
-

@@ -23,17 +23,8 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-
-    // 현재 페이지와 같은 경로면 이동하지 않음
-    if (pathname === item.href) {
-      return;
-    }
-
-    if (onNavigate) {
-      onNavigate(item.href);
-    } else {
-      router.push(item.href);
-    }
+    // 항상 onNavigate 우선 실행 (모바일 오버레이 닫힘 포함)
+    onNavigate ? onNavigate(item.href) : router.push(item.href);
   };
 
   return (

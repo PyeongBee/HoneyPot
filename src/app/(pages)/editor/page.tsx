@@ -1,6 +1,5 @@
 "use client";
 
-import Sidebar from "@/components/layout/Sidebar";
 import {
   LazyDiffViewer,
   LazyEditor,
@@ -36,7 +35,8 @@ export default function EditorPage() {
   const { isSpellCheckMode } = useSpellCheckStore();
   const { showSuccess, showError } = useToastStore();
   const { showConfirm } = useConfirmStore();
-  const { isCollapsed } = useSidebarStore();
+  const { isCollapsed, isMobileOpen, openMobileSidebar, closeMobileSidebar } =
+    useSidebarStore();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   const {
@@ -84,8 +84,6 @@ export default function EditorPage() {
   // UI 상태
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] =
-    useState<boolean>(false);
   const lastScrollYRef = useRef<number>(0);
 
   const hasUnsavedChanges = useMemo(
@@ -222,19 +220,11 @@ export default function EditorPage() {
     setIsShareModalOpen(false);
   }, []);
 
-  const handleOpenMobileSidebar = useCallback(() => {
-    setIsMobileSidebarOpen(true);
-  }, []);
-
-  const handleCloseMobileSidebar = useCallback(() => {
-    setIsMobileSidebarOpen(false);
-  }, []);
-
   // 모바일 사이드바 오버레이 시 스크롤 잠금
   useEffect(() => {
     if (!isMobile) return;
     const originalOverflow = document.body.style.overflow;
-    if (isMobileSidebarOpen) {
+    if (isMobileOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = originalOverflow;
@@ -242,7 +232,7 @@ export default function EditorPage() {
     return () => {
       document.body.style.overflow = originalOverflow;
     };
-  }, [isMobileSidebarOpen, isMobile]);
+  }, [isMobileOpen, isMobile]);
 
   const handleSelectQuestion = useCallback(
     (questionId: string) => {
@@ -256,12 +246,30 @@ export default function EditorPage() {
     setViewMode("original");
   }, [addQuestion, setViewMode]);
 
-  const handleRemoveQuestion = useCallback(
-    (questionId: string) => {
-      removeQuestion(questionId);
-    },
-    [removeQuestion]
-  );
+  const handleDeleteCurrentQuestion = useCallback(() => {
+    if (questions.length <= 1) {
+      showError("마지막 문항은 삭제할 수 없습니다.");
+      return;
+    }
+
+    showConfirm({
+      message: "문항을 삭제하시겠습니까?\n삭제된 문항은 복구할 수 없습니다.",
+      confirmText: "삭제",
+      cancelText: "취소",
+      variant: "destructive",
+      onConfirm: () => {
+        removeQuestion(activeQuestionId);
+        showSuccess("문항이 삭제되었습니다.");
+      },
+    });
+  }, [
+    questions.length,
+    activeQuestionId,
+    removeQuestion,
+    showConfirm,
+    showError,
+    showSuccess,
+  ]);
 
   const sharePayload = useMemo(
     () => ({
@@ -327,44 +335,21 @@ export default function EditorPage() {
         isMobile={isMobile}
         isCollapsed={isCollapsed}
         isHeaderVisible={isHeaderVisible}
+        isAuthenticated={isAuthenticated}
+        canDeleteQuestion={questions.length > 1}
         onModeChange={handleModeChange}
-        onMobileMenuClick={handleOpenMobileSidebar}
+        onMobileMenuClick={openMobileSidebar}
         onShareClick={handleShareButtonClick}
+        onDeleteClick={handleDeleteCurrentQuestion}
       />
 
-      {/* 모바일 사이드바 오버레이 (항상 렌더 후 트랜지션) */}
-      {isMobile && (
-        <div
-          className={`fixed inset-0 z-[1200] bg-black/45 backdrop-blur-[1px] transition-opacity duration-200 ${
-            isMobileSidebarOpen
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
-          }`}
-          onClick={handleCloseMobileSidebar}
-        >
-          <div
-            className={`absolute inset-y-0 left-0 w-64 max-w-[80vw] bg-white dark:bg-gray-900 shadow-xl transition-transform duration-200 ease-out ${
-              isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
-            onClick={e => e.stopPropagation()}
-          >
-            <Sidebar
-              isCollapsed={false}
-              onToggle={handleCloseMobileSidebar}
-              onNavigate={handleCloseMobileSidebar}
-            />
-          </div>
-        </div>
-      )}
-
       {isAuthenticated && (
-        <div className="mt-20">
+        <div className="mt-16">
           <QuestionTabs
             questions={questions}
             activeQuestionId={activeQuestionId}
             onSelect={handleSelectQuestion}
             onAdd={handleAddQuestion}
-            onRemove={handleRemoveQuestion}
           />
         </div>
       )}
