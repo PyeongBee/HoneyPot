@@ -1,6 +1,7 @@
+import React from "react";
+
 import { MESSAGES } from "@/constants/messages";
 import { useResizable } from "@/hooks/useResizable";
-import React from "react";
 
 interface OriginalEditorProps {
   originalText: string;

@@ -1,7 +1,8 @@
 import { useCallback } from "react";
+
+import { MESSAGES } from "../constants";
 import { useSpellCheckStore } from "../stores/spellCheckStore";
 import { SpellCheckResult } from "../types";
-import { MESSAGES } from "../constants";
 
 interface UseSpellCheckProps {
   showError: (message: string) => void;

@@ -1,5 +1,6 @@
-import { updateSession } from "@/lib/supabase/middleware";
 import { type NextRequest } from "next/server";
+
+import { updateSession } from "@/lib/supabase/middleware";
 
 /**
  * 미들웨어: 모든 요청에 대해 세션을 확인하고 갱신합니다.

@@ -18,20 +18,19 @@ const eslintConfig = [
       "no-console": "warn",
       "prefer-const": "error",
       "no-var": "error",
-      
+
       // React 관련 규칙
       "react/prop-types": "off",
       "react/react-in-jsx-scope": "off",
       "react-hooks/exhaustive-deps": "warn",
-      
+
       // TypeScript 관련 규칙
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/prefer-const": "error",
-      
+
       // Import 관련 규칙
       "import/order": [
-        "error",
+        "warn",
         {
           groups: [
             "builtin",
@@ -48,11 +47,12 @@ const eslintConfig = [
           },
         },
       ],
-      
+      "react/display-name": "warn",
+
       // 포맷팅 관련 규칙 (Prettier와 충돌 방지)
-      "indent": "off",
-      "quotes": "off",
-      "semi": "off",
+      indent: "off",
+      quotes: "off",
+      semi: "off",
       "comma-dangle": "off",
       "max-len": "off",
     },

@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+
 import { useQualityCheckStore } from "../stores/qualityCheckStore";
 import { QualityCheckResult } from "../types/qualityCheck";
 

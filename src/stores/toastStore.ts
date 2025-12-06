@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import { TOAST_DURATIONS } from '../styles/components';
 
 export interface ToastData {

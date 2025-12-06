@@ -1,6 +1,7 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import { createClient } from "@/lib/supabase/server";
 import { SHARE_DATA_VERSION, ShareData } from "@/types/editor";
-import { NextRequest, NextResponse } from "next/server";
 
 const normalizeShareData = (data: ShareData): ShareData => {
   if ((data as any)?.version === SHARE_DATA_VERSION) {

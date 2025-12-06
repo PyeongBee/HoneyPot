@@ -1,19 +1,20 @@
 "use client";
 
-import { Button } from "@/components/common/Button";
-import { Card, CardDescription, CardTitle } from "@/components/common/Card";
-import PageTopBar from "@/components/layout/PageTopBar";
-import { useDeviceStore } from "@/stores/deviceStore";
-import ToggleSwitch from "@/components/common/ToggleSwitch";
-import { signOut } from "@/lib/actions/auth";
-import { useAuthStore } from "@/stores/authStore";
-import { useConfirmStore } from "@/stores/confirmStore";
-import { useSidebarStore } from "@/stores/sidebarStore";
-import { useToastStore } from "@/stores/toastStore";
-import { clearShareHistory } from "@/utils/shareHistoryUtils";
 import { Database, Moon, Sun, Trash2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+
+import { Button } from "@/components/common/Button";
+import { Card, CardDescription, CardTitle } from "@/components/common/Card";
+import ToggleSwitch from "@/components/common/ToggleSwitch";
+import PageTopBar from "@/components/layout/PageTopBar";
+import { signOut } from "@/lib/actions/auth";
+import { useAuthStore } from "@/stores/authStore";
+import { useConfirmStore } from "@/stores/confirmStore";
+import { useDeviceStore } from "@/stores/deviceStore";
+import { useSidebarStore } from "@/stores/sidebarStore";
+import { useToastStore } from "@/stores/toastStore";
+import { clearShareHistory } from "@/utils/shareHistoryUtils";
 
 export default function SettingsPage() {
   const router = useRouter();

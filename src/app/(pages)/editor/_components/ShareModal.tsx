@@ -1,10 +1,11 @@
 "use client";
 
+import { Check, Copy, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+
 import { Button } from "@/components/common/Button";
 import { InputField } from "@/components/common/Input";
 import { ShareData } from "@/types/editor";
-import { Check, Copy, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
 
 interface ShareModalProps {
   isOpen: boolean;

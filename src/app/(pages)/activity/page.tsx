@@ -1,5 +1,8 @@
 "use client";
 
+import { ExternalLink, Share2, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
 import PageShell from "@/components/layout/PageShell";
@@ -14,8 +17,6 @@ import {
   generateShareTitle,
   getShareHistory,
 } from "@/utils/shareHistoryUtils";
-import { ExternalLink, Share2, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
 
 export default function ActivityPage() {
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);

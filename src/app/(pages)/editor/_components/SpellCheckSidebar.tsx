@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useCallback } from "react";
+
 import { Button } from "../../../../components/common/Button";
 import { MESSAGES } from "../../../../constants";
 import { useSpellCheckStore } from "../../../../stores/spellCheckStore";
+
 import CheckItem from "./CheckItem";
 import CheckSidebarLayout from "./layout/CheckSidebarLayout";
 

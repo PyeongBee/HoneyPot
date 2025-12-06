@@ -1,6 +1,7 @@
+import React from "react";
+
 import { CharacterCountProps } from "@/types/editor";
 import { formatNumber } from "@/utils/textUtils";
-import React from "react";
 
 const CharacterCount: React.FC<CharacterCountProps> = React.memo(
   ({ characterCount, wordCount, lineCount, isOverLimit }) => {

@@ -1,8 +1,5 @@
 "use client";
 
-import { Button } from "@/components/common/Button";
-import { Card, CardDescription, CardTitle } from "@/components/common/Card";
-import PageShell from "@/components/layout/PageShell";
 import {
   Eye,
   MessageCircle,
@@ -12,6 +9,10 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import Link from "next/link";
+
+import { Button } from "@/components/common/Button";
+import { Card, CardDescription, CardTitle } from "@/components/common/Card";
+import PageShell from "@/components/layout/PageShell";
 
 const samplePosts = [
   {

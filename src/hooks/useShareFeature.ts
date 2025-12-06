@@ -1,4 +1,7 @@
 import { useCallback } from "react";
+
+import { useAuthStore } from "@/stores/authStore";
+
 import { ShareData } from "../types/editor";
 import {
   copyToClipboard,
@@ -6,7 +9,6 @@ import {
   generateShareId,
 } from "../utils/clipboardUtils";
 import { saveShareHistory } from "../utils/shareHistoryUtils";
-import { useAuthStore } from "@/stores/authStore";
 
 export function useShareFeature(
   showSuccess: (message: string) => void,

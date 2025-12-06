@@ -1,8 +1,10 @@
 import React, { useCallback, useState } from "react";
+
 import { useMemoHighlight } from "../../../../hooks/useMemoHighlight";
 import { useResizable } from "../../../../hooks/useResizable";
 import { useTextSelection } from "../../../../hooks/useTextSelection";
 import { Memo } from "../../../../types/editor";
+
 import DiffTextRenderer from "./DiffTextRenderer";
 import DiffViewerHeader from "./DiffViewerHeader";
 import MemoInput from "./MemoInput";

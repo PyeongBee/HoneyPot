@@ -1,8 +1,10 @@
 "use client";
 
+import React from "react";
+
 import { MENU_ITEMS } from "@/constants";
 import { getSidebarClasses } from "@/styles/components";
-import React from "react";
+
 import SidebarLogo from "./sidebar/SidebarLogo";
 import SidebarMenuItem from "./sidebar/SidebarMenuItem";
 import SidebarToggle from "./sidebar/SidebarToggle";

@@ -1,5 +1,6 @@
 import * as Diff from "diff";
 import React from "react";
+
 import { useMemoHighlight } from "../../../../hooks/useMemoHighlight";
 import { Memo } from "../../../../types/editor";
 

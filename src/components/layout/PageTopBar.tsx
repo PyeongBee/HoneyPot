@@ -1,6 +1,7 @@
-import { cn } from "@/styles/components";
 import { Menu } from "lucide-react";
 import React from "react";
+
+import { cn } from "@/styles/components";
 
 interface PageTopBarProps {
   title: string;

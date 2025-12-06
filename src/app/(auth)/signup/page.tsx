@@ -1,15 +1,16 @@
 "use client";
 
-import { Button } from "@/components/common/Button";
-import { InputField, InputLabel } from "@/components/common/Input";
-import { useAuth } from "@/hooks/useAuth";
-import { signUp } from "@/lib/actions/auth";
-import { useToastStore } from "@/stores/toastStore";
 import { Loader2, Lock, Mail, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+
+import { Button } from "@/components/common/Button";
+import { InputField, InputLabel } from "@/components/common/Input";
+import { useAuth } from "@/hooks/useAuth";
+import { signUp } from "@/lib/actions/auth";
+import { useToastStore } from "@/stores/toastStore";
 
 export default function SignUpPage() {
   const router = useRouter();

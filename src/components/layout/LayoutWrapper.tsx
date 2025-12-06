@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
 import { MOBILE_BREAKPOINT } from "../../constants/editor";
 import { useConfirmStore } from "../../stores/confirmStore";
 import { useSidebarStore } from "../../stores/sidebarStore";
@@ -9,6 +10,7 @@ import { ToastData, useToastStore } from "../../stores/toastStore";
 import AuthProvider from "../auth/AuthProvider";
 import ConfirmDialog from "../common/ConfirmDialog";
 import Toast from "../common/Toast";
+
 import Sidebar from "./Sidebar";
 
 interface LayoutWrapperProps {
@@ -16,13 +18,8 @@ interface LayoutWrapperProps {
 }
 
 export default function LayoutWrapper({ children }: LayoutWrapperProps) {
-  const {
-    isCollapsed,
-    toggleSidebar,
-    isMobileOpen,
-    openMobileSidebar,
-    closeMobileSidebar,
-  } = useSidebarStore();
+  const { isCollapsed, toggleSidebar, isMobileOpen, closeMobileSidebar } =
+    useSidebarStore();
   const { showConfirm } = useConfirmStore();
   const { toasts, removeToast } = useToastStore();
   const pathname = usePathname();

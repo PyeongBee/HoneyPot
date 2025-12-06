@@ -1,6 +1,8 @@
-import { AuthActions, AuthState } from "@/types/auth";
 import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
+
+import { AuthActions, AuthState } from "@/types/auth";
+
 import { useToastStore } from "./toastStore";
 
 /**

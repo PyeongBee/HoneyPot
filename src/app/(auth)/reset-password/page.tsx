@@ -1,15 +1,16 @@
 "use client";
 
-import { Button } from "@/components/common/Button";
-import { InputField, InputLabel } from "@/components/common/Input";
-import { resetPassword, signOut, updatePassword } from "@/lib/actions/auth";
-import { useAuthStore } from "@/stores/authStore";
-import { useToastStore } from "@/stores/toastStore";
 import { ArrowLeft, Loader2, Lock, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState, useTransition } from "react";
+
+import { Button } from "@/components/common/Button";
+import { InputField, InputLabel } from "@/components/common/Input";
+import { resetPassword, signOut, updatePassword } from "@/lib/actions/auth";
+import { useAuthStore } from "@/stores/authStore";
+import { useToastStore } from "@/stores/toastStore";
 
 function ResetPasswordForm() {
   const { showError, showSuccess } = useToastStore();

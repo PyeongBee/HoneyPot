@@ -1,5 +1,9 @@
 "use client";
 
+import { ChevronDown, LogOut, Menu } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+
 import {
   MENU_LABELS,
   MORE_MENU_ITEMS,
@@ -7,11 +11,8 @@ import {
 } from "@/constants/navigation";
 import { signOut } from "@/lib/actions/auth";
 import { useAuthStore } from "@/stores/authStore";
-import { useToastStore } from "@/stores/toastStore";
 import { useSidebarStore } from "@/stores/sidebarStore";
-import { ChevronDown, LogOut, Menu } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useToastStore } from "@/stores/toastStore";
 
 interface UserProfileProps {
   isCollapsed: boolean;

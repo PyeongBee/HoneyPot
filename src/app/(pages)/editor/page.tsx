@@ -1,5 +1,7 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import {
   LazyDiffViewer,
   LazyEditor,
@@ -19,7 +21,7 @@ import { useSpellCheckStore } from "@/stores/spellCheckStore";
 import { useToastStore } from "@/stores/toastStore";
 import { SHARE_DATA_VERSION } from "@/types/editor";
 import { getTextStats } from "@/utils/textUtils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import EditorMobileModeNav from "./_components/layout/EditorMobileModeNav";
 import EditorSidebar from "./_components/layout/EditorSidebar";
 import EditorUpperHeader from "./_components/layout/EditorUpperHeader";

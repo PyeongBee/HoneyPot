@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+
 import { useSpellCheckStore } from "../../../../stores/spellCheckStore";
 
 interface HighlightedTextProps {

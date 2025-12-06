@@ -2,8 +2,10 @@
 
 import { AlertCircle, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
+
 import { useConfirmStore } from "../../stores/confirmStore";
 import { cn } from "../../styles/components";
+
 import { Button } from "./Button";
 
 const ConfirmDialog: React.FC = () => {

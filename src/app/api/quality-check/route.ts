@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { QualityCheckResult, QualityIssue } from "../../../types/qualityCheck";
 
 // 의미 없는 강조 부사

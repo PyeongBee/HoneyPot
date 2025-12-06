@@ -2,10 +2,12 @@
 
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import React from "react";
+
 import { Button } from "../../../../components/common/Button";
 import { useQualityCheckStore } from "../../../../stores/qualityCheckStore";
 import { QualityIssueType } from "../../../../types/qualityCheck";
 import { filterRemovableIssues } from "../../../../utils/correctionUtils";
+
 import CheckItem from "./CheckItem";
 import CheckSidebarLayout from "./layout/CheckSidebarLayout";
 

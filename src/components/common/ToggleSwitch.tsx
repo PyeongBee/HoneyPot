@@ -1,4 +1,5 @@
 import React from "react";
+
 import { getToggleSwitchClasses, getToggleThumbClasses, type ToggleSize } from "@/styles/components";
 import { cn } from "@/styles/components";
 

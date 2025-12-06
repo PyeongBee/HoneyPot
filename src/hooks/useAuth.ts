@@ -1,10 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
+
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
 import { OAuthProvider } from "@/types/auth";
-import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { normalizeInternalPath } from "@/utils/url";
 
 /**
@@ -39,7 +40,7 @@ export function useAuth() {
     });
 
     return () => subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // 탭 포커스/가시성 변경 시 세션 동기화로 UI 최신화

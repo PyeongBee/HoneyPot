@@ -1,8 +1,10 @@
 "use client";
 
+import { Share2, Trash2 } from "lucide-react";
+
 import PageTopBar from "@/components/layout/PageTopBar";
 import { ViewMode } from "@/types/editor";
-import { Share2, Trash2 } from "lucide-react";
+
 import EditorModeSelector from "./EditorModeSelector";
 
 interface EditorUpperHeaderProps {

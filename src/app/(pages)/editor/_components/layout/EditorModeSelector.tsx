@@ -1,7 +1,9 @@
 "use client";
 
-import { ViewMode } from "@/types/editor";
 import React from "react";
+
+import { ViewMode } from "@/types/editor";
+
 import { ModeButton } from "./ModeButton";
 
 interface EditorModeSelectorProps {

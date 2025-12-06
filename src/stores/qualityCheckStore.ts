@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import { QualityCheckResult, QualityCheckState } from "../types/qualityCheck";
 
 export const useQualityCheckStore = create<QualityCheckState>((set, get) => ({

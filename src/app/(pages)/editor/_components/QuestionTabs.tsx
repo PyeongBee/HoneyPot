@@ -1,8 +1,9 @@
 "use client";
 
-import { EditorQuestionState } from "@/types/editor";
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
+
+import { EditorQuestionState } from "@/types/editor";
 
 interface QuestionTabsProps {
   questions: EditorQuestionState[];
