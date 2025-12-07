@@ -1,10 +1,11 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { MOBILE_BREAKPOINT } from "../../constants/editor";
 import { useConfirmStore } from "../../stores/confirmStore";
+import { useLayoutStore } from "../../stores/layoutStore";
 import { useSidebarStore } from "../../stores/sidebarStore";
 import { ToastData, useToastStore } from "../../stores/toastStore";
 import AuthProvider from "../auth/AuthProvider";
@@ -26,6 +27,41 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+  const lastScrollTop = useRef(0);
+  const { setHeaderHidden } = useLayoutStore();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!mainRef.current) return;
+
+      const currentScrollTop = mainRef.current.scrollTop;
+      const isScrollDown = currentScrollTop > lastScrollTop.current;
+
+      if (isMobile) {
+        if (currentScrollTop <= 80) {
+          setHeaderHidden(false);
+        } else if (Math.abs(currentScrollTop - lastScrollTop.current) > 5) {
+          setHeaderHidden(isScrollDown);
+        }
+      } else {
+        setHeaderHidden(false);
+      }
+
+      lastScrollTop.current = currentScrollTop;
+    };
+
+    const mainElement = mainRef.current;
+    if (mainElement) {
+      mainElement.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (mainElement) {
+        mainElement.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [setHeaderHidden]);
 
   // 에디터 페이지에서 unsaved changes 확인
   const handleNavigation = (href: string) => {
@@ -129,7 +165,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
         {/* 메인 컨텐츠 영역 */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <main className={`flex-1 overflow-auto`}>
+          <main ref={mainRef} className={`flex-1 overflow-auto`}>
             <div
               className={`mx-auto ${isMobile ? "w-full px-4" : "w-full px-6"}`}
             >

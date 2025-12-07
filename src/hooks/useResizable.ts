@@ -15,6 +15,7 @@ interface UseResizableReturn {
   height: number;
   isResizing: boolean;
   handleMouseDown: (e: React.MouseEvent) => void;
+  handleTouchStart: (e: React.TouchEvent) => void;
   resetHeight: () => void;
 }
 
@@ -60,6 +61,17 @@ export function useResizable({
     [height]
   );
 
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      // 터치 이벤트 전파 방지 (스크롤 등)
+      // e.preventDefault()는 passive listener에서는 무시될 수 있음
+      setIsResizing(true);
+      startYRef.current = e.touches[0].clientY;
+      startHeightRef.current = height;
+    },
+    [height]
+  );
+
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (!isResizing) return;
@@ -72,7 +84,27 @@ export function useResizable({
     [isResizing, minHeight, maxHeight]
   );
 
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (!isResizing) return;
+
+      if (e.cancelable) {
+        e.preventDefault(); // 스크롤 방지
+      }
+
+      const deltaY = e.touches[0].clientY - startYRef.current;
+      const newHeight = startHeightRef.current + deltaY;
+
+      setHeight(Math.max(minHeight, Math.min(maxHeight, newHeight)));
+    },
+    [isResizing, minHeight, maxHeight]
+  );
+
   const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
     setIsResizing(false);
   }, []);
 
@@ -87,22 +119,36 @@ export function useResizable({
     if (isResizing) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("touchmove", handleTouchMove, { passive: false });
+      document.addEventListener("touchend", handleTouchEnd);
       document.body.style.cursor = "ns-resize";
       document.body.style.userSelect = "none";
+      // 모바일 스크롤 방지 스타일
+      document.body.style.touchAction = "none";
 
       return () => {
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
+        document.removeEventListener("touchmove", handleTouchMove);
+        document.removeEventListener("touchend", handleTouchEnd);
         document.body.style.cursor = "";
         document.body.style.userSelect = "";
+        document.body.style.touchAction = "";
       };
     }
-  }, [isResizing, handleMouseMove, handleMouseUp]);
+  }, [
+    isResizing,
+    handleMouseMove,
+    handleMouseUp,
+    handleTouchMove,
+    handleTouchEnd,
+  ]);
 
   return {
     height,
     isResizing,
     handleMouseDown,
+    handleTouchStart,
     resetHeight,
   };
 }

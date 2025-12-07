@@ -16,6 +16,7 @@ import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 import { useAuthStore } from "@/stores/authStore";
 import { useConfirmStore } from "@/stores/confirmStore";
 import { useDeviceStore } from "@/stores/deviceStore";
+import { useLayoutStore } from "@/stores/layoutStore";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { useSpellCheckStore } from "@/stores/spellCheckStore";
 import { useToastStore } from "@/stores/toastStore";
@@ -84,7 +85,7 @@ export default function EditorPage() {
   }, [activeQuestionId]);
 
   // UI 상태
-  const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
+  const { isHeaderHidden } = useLayoutStore();
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
   const lastScrollYRef = useRef<number>(0);
 
@@ -132,32 +133,6 @@ export default function EditorPage() {
       void loadSharedData(showSuccess, showError);
     }
   }, [isClient, loadSharedData, showSuccess, showError]);
-
-  // 헤더 표시/숨김 (스크롤)
-  useEffect(() => {
-    lastScrollYRef.current =
-      window.pageYOffset || document.documentElement.scrollTop || 0;
-
-    let ticking = false;
-    const handleScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const currentScrollY =
-          window.pageYOffset || document.documentElement.scrollTop || 0;
-        const lastY = lastScrollYRef.current;
-        const isNearTop = currentScrollY < 80;
-        const isScrollingUp = currentScrollY < lastY;
-
-        setIsHeaderVisible(isNearTop || isScrollingUp);
-        lastScrollYRef.current = currentScrollY;
-        ticking = false;
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // 모드 변경 핸들러
   const handleModeChange = useCallback(
@@ -336,7 +311,7 @@ export default function EditorPage() {
         viewMode={viewMode}
         isMobile={isMobile}
         isCollapsed={isCollapsed}
-        isHeaderVisible={isHeaderVisible}
+        isHeaderVisible={!isHeaderHidden}
         isAuthenticated={isAuthenticated}
         canDeleteQuestion={questions.length > 1}
         onModeChange={handleModeChange}

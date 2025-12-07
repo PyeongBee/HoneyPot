@@ -41,7 +41,7 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
   const { result: qualityResult, clearResult: clearQualityResult } =
     useQualityCheckStore();
 
-  const { height, isResizing, handleMouseDown } = useResizable({
+  const { height, isResizing, handleMouseDown, handleTouchStart } = useResizable({
     minHeight: 200,
     maxHeight: 800,
     defaultHeight: 512,
@@ -148,6 +148,8 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
               ${isResizing ? "bg-blue-500 bg-opacity-30" : ""}
             `}
             onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            style={{ touchAction: "none" }}
             title="드래그하여 크기 조정"
           >
             <div className="w-12 h-1 rounded-full bg-gray-400 dark:bg-gray-500" />

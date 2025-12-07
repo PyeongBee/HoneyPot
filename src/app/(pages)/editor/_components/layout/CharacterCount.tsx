@@ -12,10 +12,13 @@ const CharacterCount: React.FC<CharacterCountProps> = React.memo(
     ];
 
     return (
-      <div className="flex flex-col gap-2 text-sm">
+      <div className="flex flex-row md:flex-col justify-around md:justify-start gap-2 text-sm">
         {stats.map(({ label, value, isOverLimit: overLimit = false }) => (
-          <div key={label} className="flex items-center justify-between gap-2">
-            <span className="text-gray-600 dark:text-gray-400">{label}:</span>
+          <div
+            key={label}
+            className="flex md:flex items-center md:justify-between gap-3 md:gap-2"
+          >
+            <span className="text-gray-600 dark:text-gray-400">{label}</span>
             <span
               className={`font-medium ${
                 overLimit

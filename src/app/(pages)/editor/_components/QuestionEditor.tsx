@@ -4,6 +4,7 @@ import clsx from "clsx";
 
 import { InputField, InputLabel } from "@/components/common/Input";
 import { DEFAULT_CHAR_LIMIT } from "@/constants/editor";
+import { useDeviceStore } from "@/stores/deviceStore";
 import { ViewMode } from "@/types/editor";
 import { TextStats } from "@/utils/textUtils";
 
@@ -30,10 +31,11 @@ export default function QuestionEditor({
   originalStats,
   editedStats,
 }: QuestionEditorProps) {
+  const { isMobile } = useDeviceStore();
   const stats = viewMode === "original" ? originalStats : editedStats;
 
   return (
-    <div className={clsx("dark:bg-gray-800", containerClassName ?? "mt-14")}>
+    <div className={clsx("dark:bg-gray-800", containerClassName ?? "mt-16")}>
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-2">
         {viewMode === "original" ? (
           <div className="lg:col-span-3">
@@ -66,8 +68,8 @@ export default function QuestionEditor({
 
         {viewMode === "original" && (
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
-              <div className="flex items-center gap-3 mb-2">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-3 sticky top-24">
+              <div className="flex items-center gap-3 md:mb-2">
                 <InputLabel
                   htmlFor="char-limit-input"
                   className="text-sm font-medium text-gray-900 dark:text-white"
@@ -77,6 +79,7 @@ export default function QuestionEditor({
                 <InputField
                   id="char-limit-input"
                   type="text"
+                  size="sm"
                   value={questionCharLimit}
                   onChange={value =>
                     onQuestionLimitChange(parseInt(value) || DEFAULT_CHAR_LIMIT)
@@ -84,28 +87,30 @@ export default function QuestionEditor({
                   className="w-24 text-center font-medium"
                 />
               </div>
-              <div className="flex flex-wrap justify-around gap-2">
-                {[500, 1000, 2000].map(limit => (
-                  <button
-                    key={limit}
-                    onClick={() => onQuestionLimitChange(limit)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                      questionCharLimit === limit
-                        ? "bg-amber-800 text-white"
-                        : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                    }`}
-                  >
-                    {limit}
-                  </button>
-                ))}
-              </div>
+              {!isMobile && (
+                <div className="flex flex-wrap justify-around gap-2">
+                  {[500, 1000, 2000].map(limit => (
+                    <button
+                      key={limit}
+                      onClick={() => onQuestionLimitChange(limit)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        questionCharLimit === limit
+                          ? "bg-amber-500 text-white"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      }`}
+                    >
+                      {limit}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {viewMode !== "original" && (
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-2.5 sticky top-24">
               <CharacterCount
                 characterCount={stats.characterCount}
                 wordCount={stats.wordCount}
