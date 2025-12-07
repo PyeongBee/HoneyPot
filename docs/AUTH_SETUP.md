@@ -1,6 +1,6 @@
 # 🔐 인증 시스템 설정 가이드
 
-HoneyPot 프로젝트의 Supabase 기반 인증 시스템 설정 방법을 안내합니다.
+Waggle 프로젝트의 Supabase 기반 인증 시스템 설정 방법을 안내합니다.
 
 ## 📋 목차
 
@@ -26,7 +26,7 @@ HoneyPot 프로젝트의 Supabase 기반 인증 시스템 설정 방법을 안�
 
 1. "New Project" 클릭
 2. 프로젝트 정보 입력:
-   - **Name**: HoneyPot (또는 원하는 이름)
+   - **Name**: Waggle (또는 원하는 이름)
    - **Database Password**: 강력한 비밀번호 생성 (저장 필수!)
    - **Region**: Northeast Asia (Seoul)
    - **Pricing Plan**: Free
@@ -78,7 +78,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 3. **APIs & Services** > **OAuth consent screen** 이동
 4. User Type: **External** 선택
 5. 앱 정보 입력:
-   - App name: HoneyPot
+   - App name: Waggle
    - User support email: 본인 이메일
    - Developer contact: 본인 이메일
 6. Scopes: `.../auth/userinfo.email`, `.../auth/userinfo.profile` 추가
@@ -89,7 +89,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 1. **APIs & Services** > **Credentials** 이동
 2. **Create Credentials** > **OAuth client ID** 클릭
 3. Application type: **Web application**
-4. Name: HoneyPot
+4. Name: Waggle
 5. **Authorized redirect URIs** 추가:
    ```
    https://your-project.supabase.co/auth/v1/callback
@@ -113,7 +113,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 1. GitHub Settings > **Developer settings** > **OAuth Apps**
 2. **New OAuth App** 클릭
 3. 정보 입력:
-   - Application name: HoneyPot
+   - Application name: Waggle
    - Homepage URL: `http://localhost:3000`
    - Authorization callback URL:
      ```
@@ -254,7 +254,7 @@ npm run dev
 
 ## 🎉 완료!
 
-이제 HoneyPot 프로젝트에서 완전한 인증 시스템을 사용할 수 있습니다.
+이제 Waggle 프로젝트에서 완전한 인증 시스템을 사용할 수 있습니다.
 
 ### 주요 기능
 

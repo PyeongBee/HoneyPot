@@ -22,7 +22,7 @@ const pacifico = Pacifico({
 });
 
 export const metadata: Metadata = {
-  title: "HoneyPot",
+  title: "Waggle",
   description: "평비의 꿀단지 - 자소서 작성 및 프로젝트 공유 플랫폼",
 };
 

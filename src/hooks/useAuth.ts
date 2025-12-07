@@ -15,7 +15,9 @@ import { normalizeInternalPath } from "@/utils/url";
 export function useAuth() {
   const { user, isLoading, isAuthenticated } = useAuthStore();
   const router = useRouter();
-  const prevAuthenticated = useRef<boolean>(useAuthStore.getState().isAuthenticated);
+  const prevAuthenticated = useRef<boolean>(
+    useAuthStore.getState().isAuthenticated
+  );
   const prompted = useRef<boolean>(false);
 
   // 초기 세션 로드 및 상태 구독
@@ -40,7 +42,6 @@ export function useAuth() {
     });
 
     return () => subscription.unsubscribe();
-     
   }, []);
 
   // 탭 포커스/가시성 변경 시 세션 동기화로 UI 최신화
@@ -51,7 +52,7 @@ export function useAuth() {
     let syncing = false;
     const askRelogin = async (): Promise<boolean> => {
       const anyWindow: any = window as any;
-      const customConfirm = anyWindow?.__honeypotConfirm;
+      const customConfirm = anyWindow?.__waggleConfirm;
       if (typeof customConfirm === "function") {
         try {
           const result = await customConfirm({
@@ -79,7 +80,11 @@ export function useAuth() {
         const newAuthenticated = !!session?.user;
         setUser(session?.user ?? null);
 
-        if (prevAuthenticated.current && !newAuthenticated && !prompted.current) {
+        if (
+          prevAuthenticated.current &&
+          !newAuthenticated &&
+          !prompted.current
+        ) {
           prompted.current = true;
           const shouldLogin = await askRelogin();
           if (shouldLogin) {

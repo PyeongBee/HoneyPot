@@ -112,7 +112,7 @@ function ResetPasswordForm() {
           <div className="flex justify-center mb-6">
             <Image
               src="/logo_Bee_lsh_clear_gra.png"
-              alt="HoneyPot"
+              alt="Waggle"
               width={80}
               height={80}
               priority
@@ -153,7 +153,7 @@ function ResetPasswordForm() {
             <div className="flex justify-center mb-6">
               <Image
                 src="/logo_Bee_lsh_clear_gra.png"
-                alt="HoneyPot"
+                alt="Waggle"
                 width={80}
                 height={80}
                 priority
@@ -244,7 +244,7 @@ function ResetPasswordForm() {
           <div className="flex justify-center mb-6">
             <Image
               src="/logo_Bee_lsh_clear_gra.png"
-              alt="HoneyPot"
+              alt="Waggle"
               width={80}
               height={80}
               priority
