@@ -3,6 +3,7 @@ import React, { useCallback, useState } from "react";
 import { useMemoHighlight } from "../../../../hooks/useMemoHighlight";
 import { useResizable } from "../../../../hooks/useResizable";
 import { useTextSelection } from "../../../../hooks/useTextSelection";
+import { useEditorStore } from "../../../../stores/editorStore";
 import { Memo } from "../../../../types/editor";
 
 import DiffTextRenderer from "./DiffTextRenderer";
@@ -10,20 +11,13 @@ import DiffViewerHeader from "./DiffViewerHeader";
 import MemoInput from "./MemoInput";
 
 interface DiffViewerProps {
-  originalText: string;
-  editedText: string;
-  memos: Memo[];
-  onAddMemo: (memo: Memo) => void;
   highlightedMemo: string | null;
 }
 
 const DiffViewer: React.FC<DiffViewerProps> = React.memo(function DiffViewer({
-  originalText,
-  editedText,
-  memos,
-  onAddMemo,
   highlightedMemo,
 }) {
+  const { originalText, editedText, memos, addMemo } = useEditorStore();
   const [viewMode, setViewMode] = useState<"diff" | "final">("diff");
 
   const { height, isResizing, handleMouseDown } = useResizable({
@@ -74,10 +68,10 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(function DiffViewer({
         timestamp: new Date().toISOString(),
       };
 
-      onAddMemo(newMemo);
+      addMemo(newMemo);
       handleClearSelection();
     },
-    [selectedText, onAddMemo, handleClearSelection]
+    [selectedText, addMemo, handleClearSelection]
   );
 
   /**

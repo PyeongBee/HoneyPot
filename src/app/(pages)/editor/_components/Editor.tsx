@@ -10,6 +10,7 @@ import { MESSAGES } from "../../../../constants";
 import { useQualityCheck } from "../../../../hooks/useQualityCheck";
 import { useResizable } from "../../../../hooks/useResizable";
 import { useSpellCheck } from "../../../../hooks/useSpellCheck";
+import { useEditorStore } from "../../../../stores/editorStore";
 import { useQualityCheckStore } from "../../../../stores/qualityCheckStore";
 import { useToastStore } from "../../../../stores/toastStore";
 import { cn } from "../../../../styles/components";
@@ -19,19 +20,15 @@ import HighlightedText from "./HighlightedText";
 import QualityHighlightedText from "./QualityHighlightedText";
 
 interface EditorProps {
-  originalText: string;
-  editedText: string;
-  onEditedChange: (text: string) => void;
   onQualityCheckToggle?: (isActive: boolean) => void;
 }
 
 const Editor: React.FC<EditorProps> = React.memo(function Editor({
-  originalText,
-  editedText,
-  onEditedChange,
   onQualityCheckToggle,
 }) {
   const { showError, showSuccess } = useToastStore();
+  const { originalText, editedText, setEditedText } = useEditorStore();
+
   const { isSpellCheckMode, isLoading, performSpellCheck, cancelSpellCheck } =
     useSpellCheck({
       showError,
@@ -41,19 +38,20 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
   const { result: qualityResult, clearResult: clearQualityResult } =
     useQualityCheckStore();
 
-  const { height, isResizing, handleMouseDown, handleTouchStart } = useResizable({
-    minHeight: 200,
-    maxHeight: 800,
-    defaultHeight: 512,
-    storageKey: "editor-edited-height",
-  });
+  const { height, isResizing, handleMouseDown, handleTouchStart } =
+    useResizable({
+      minHeight: 200,
+      maxHeight: 800,
+      defaultHeight: 512,
+      storageKey: "editor-edited-height",
+    });
 
   const isQualityCheckMode = !!qualityResult;
   const isTextEmpty = !editedText.trim();
 
   const handleCopyOriginal = useCallback(() => {
-    onEditedChange(originalText);
-  }, [originalText, onEditedChange]);
+    setEditedText(originalText);
+  }, [originalText, setEditedText]);
 
   const handleSpellCheck = useCallback(() => {
     performSpellCheck(editedText);
@@ -109,7 +107,7 @@ const Editor: React.FC<EditorProps> = React.memo(function Editor({
         )}
         style={{ height: `${height}px` }}
         value={editedText}
-        onChange={e => onEditedChange(e.target.value)}
+        onChange={e => setEditedText(e.target.value)}
         placeholder={MESSAGES.LABELS.EDIT_PLACEHOLDER}
         aria-label={MESSAGES.LABELS.EDITOR_ARIA}
       />

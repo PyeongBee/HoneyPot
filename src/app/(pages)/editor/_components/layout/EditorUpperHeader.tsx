@@ -3,35 +3,34 @@
 import { Share2, Trash2 } from "lucide-react";
 
 import PageTopBar from "@/components/layout/PageTopBar";
-import { ViewMode } from "@/types/editor";
+import { useAuthStore } from "@/stores/authStore";
+import { useDeviceStore } from "@/stores/deviceStore";
+import { useEditorStore } from "@/stores/editorStore";
+import { useLayoutStore } from "@/stores/layoutStore";
+import { useSidebarStore } from "@/stores/sidebarStore";
 
 import EditorModeSelector from "./EditorModeSelector";
 
 interface EditorUpperHeaderProps {
-  viewMode: ViewMode;
-  isMobile: boolean;
-  isCollapsed: boolean;
-  isHeaderVisible: boolean;
-  isAuthenticated: boolean;
-  canDeleteQuestion: boolean;
-  onModeChange: (mode: ViewMode) => void;
   onMobileMenuClick?: () => void;
   onShareClick?: () => void;
   onDeleteClick?: () => void;
 }
 
 export default function EditorUpperHeader({
-  viewMode,
-  isMobile,
-  isCollapsed,
-  isHeaderVisible,
-  isAuthenticated,
-  canDeleteQuestion,
-  onModeChange,
   onMobileMenuClick,
   onShareClick,
   onDeleteClick,
 }: EditorUpperHeaderProps) {
+  const { viewMode, setViewMode, questions } = useEditorStore();
+  const { isAuthenticated } = useAuthStore();
+  const { isMobile } = useDeviceStore();
+  const { isHeaderHidden } = useLayoutStore();
+  const { isCollapsed } = useSidebarStore();
+
+  const canDeleteQuestion = questions.length > 1;
+  const isHeaderVisible = !isHeaderHidden;
+
   const mobileRightSlot = (
     <>
       {isAuthenticated && canDeleteQuestion && (
@@ -59,7 +58,7 @@ export default function EditorUpperHeader({
     <EditorModeSelector
       viewMode={viewMode}
       isMobile={isMobile}
-      onModeChange={onModeChange}
+      onModeChange={setViewMode}
     />
   );
 

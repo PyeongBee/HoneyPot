@@ -5,33 +5,31 @@ import clsx from "clsx";
 import { InputField, InputLabel } from "@/components/common/Input";
 import { DEFAULT_CHAR_LIMIT } from "@/constants/editor";
 import { useDeviceStore } from "@/stores/deviceStore";
-import { ViewMode } from "@/types/editor";
-import { TextStats } from "@/utils/textUtils";
+import { useEditorStore } from "@/stores/editorStore";
+import { getTextStats } from "@/utils/textUtils";
 
 import CharacterCount from "./layout/CharacterCount";
 
 interface QuestionEditorProps {
-  viewMode: ViewMode;
-  questionText: string;
-  questionCharLimit: number;
-  onQuestionChange: (text: string) => void;
-  onQuestionLimitChange: (limit: number) => void;
   containerClassName?: string;
-  originalStats: TextStats;
-  editedStats: TextStats;
 }
 
 export default function QuestionEditor({
-  viewMode,
-  questionText,
-  questionCharLimit,
-  onQuestionChange,
-  onQuestionLimitChange,
   containerClassName,
-  originalStats,
-  editedStats,
 }: QuestionEditorProps) {
   const { isMobile } = useDeviceStore();
+  const {
+    viewMode,
+    questionText,
+    questionCharLimit,
+    originalText,
+    editedText,
+    setQuestionText,
+    setQuestionCharLimit,
+  } = useEditorStore();
+
+  const originalStats = getTextStats(originalText, questionCharLimit);
+  const editedStats = getTextStats(editedText, questionCharLimit);
   const stats = viewMode === "original" ? originalStats : editedStats;
 
   return (
@@ -43,7 +41,7 @@ export default function QuestionEditor({
               <textarea
                 id="question-input"
                 value={questionText}
-                onChange={e => onQuestionChange(e.target.value)}
+                onChange={e => setQuestionText(e.target.value)}
                 placeholder="자소서 문항을 입력하세요. 예: '본인의 성장 과정에서 가장 중요한 경험은 무엇이며, 그것이 현재의 당신에게 어떤 영향을 미쳤나요?'"
                 className="w-full h-24 p-4 border-0 resize-none focus:outline-none focus:ring-0 
                          bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
@@ -82,7 +80,7 @@ export default function QuestionEditor({
                   size="sm"
                   value={questionCharLimit}
                   onChange={value =>
-                    onQuestionLimitChange(parseInt(value) || DEFAULT_CHAR_LIMIT)
+                    setQuestionCharLimit(parseInt(value) || DEFAULT_CHAR_LIMIT)
                   }
                   className="w-24 text-center font-medium"
                 />
@@ -92,7 +90,7 @@ export default function QuestionEditor({
                   {[500, 1000, 2000].map(limit => (
                     <button
                       key={limit}
-                      onClick={() => onQuestionLimitChange(limit)}
+                      onClick={() => setQuestionCharLimit(limit)}
                       className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                         questionCharLimit === limit
                           ? "bg-amber-500 text-white"

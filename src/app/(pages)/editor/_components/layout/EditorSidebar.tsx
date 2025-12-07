@@ -2,30 +2,22 @@
 
 import React from "react";
 
-import { Memo, ViewMode } from "../../../../../types/editor";
-import { TextStats } from "../../../../../utils/textUtils";
+import { useEditorStore } from "@/stores/editorStore";
+import { Memo } from "@/types/editor";
 
 interface EditorSidebarProps {
-  viewMode: ViewMode;
-  memos: Memo[];
-  originalStats: TextStats;
-  editedStats: TextStats;
-  onDeleteMemo: (memoId: string) => void;
   onMemoClick: (memo: Memo) => void;
   onMemoHover: (memoId: string | null) => void;
   renderCheckSidebar?: React.ReactNode;
 }
 
 const EditorSidebar: React.FC<EditorSidebarProps> = ({
-  viewMode,
-  memos,
-  originalStats: _originalStats,
-  editedStats: _editedStats,
-  onDeleteMemo,
   onMemoClick,
   onMemoHover,
   renderCheckSidebar,
 }) => {
+  const { viewMode, memos, deleteMemo } = useEditorStore();
+
   // 맞춤법/품질 검사 모드일 때는 해당 사이드바만 표시
   if (renderCheckSidebar) {
     return <div className="sticky top-24">{renderCheckSidebar}</div>;
@@ -69,7 +61,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                     <button
                       onClick={e => {
                         e.stopPropagation();
-                        onDeleteMemo(memo.id);
+                        deleteMemo(memo.id);
                       }}
                       className="ml-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm flex-shrink-0"
                       title="메모 삭제"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   LazyDiffViewer,
@@ -9,19 +9,17 @@ import {
   LazyQualityCheckSidebar,
   LazySpellCheckSidebar,
 } from "@/components/lazy/index";
-import { useEditorState } from "@/hooks/useEditorState";
 import { useShareFeature } from "@/hooks/useShareFeature";
 import { useTextCorrections } from "@/hooks/useTextCorrections";
 import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 import { useAuthStore } from "@/stores/authStore";
 import { useConfirmStore } from "@/stores/confirmStore";
 import { useDeviceStore } from "@/stores/deviceStore";
-import { useLayoutStore } from "@/stores/layoutStore";
+import { useEditorStore } from "@/stores/editorStore";
 import { useSidebarStore } from "@/stores/sidebarStore";
 import { useSpellCheckStore } from "@/stores/spellCheckStore";
 import { useToastStore } from "@/stores/toastStore";
 import { SHARE_DATA_VERSION } from "@/types/editor";
-import { getTextStats } from "@/utils/textUtils";
 
 import EditorMobileModeNav from "./_components/layout/EditorMobileModeNav";
 import EditorSidebar from "./_components/layout/EditorSidebar";
@@ -38,32 +36,21 @@ export default function EditorPage() {
   const { isSpellCheckMode } = useSpellCheckStore();
   const { showSuccess, showError } = useToastStore();
   const { showConfirm } = useConfirmStore();
-  const { isCollapsed, isMobileOpen, openMobileSidebar, closeMobileSidebar } =
-    useSidebarStore();
+  const { isMobileOpen, openMobileSidebar } = useSidebarStore();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
+  // Editor Store
   const {
     questions,
     activeQuestionId,
-    originalText,
     editedText,
-    questionText,
-    questionCharLimit,
     viewMode,
-    memos,
-    isClient,
-    setOriginalText,
     setEditedText,
-    setQuestionText,
-    setQuestionCharLimit,
-    setViewMode,
-    setActiveQuestionId,
-    loadSharedData,
-    addMemo,
-    deleteMemo,
-    addQuestion,
     removeQuestion,
-  } = useEditorState();
+    loadSharedData,
+  } = useEditorStore();
+
+  const [isClient, setIsClient] = useState(false);
 
   const { createShare, copyShareUrl } = useShareFeature(showSuccess, showError);
 
@@ -80,14 +67,13 @@ export default function EditorPage() {
   const [isQualityCheckActive, setIsQualityCheckActive] =
     useState<boolean>(false);
   const [highlightedMemo, setHighlightedMemo] = useState<string | null>(null);
+
   useEffect(() => {
     setHighlightedMemo(null);
   }, [activeQuestionId]);
 
   // UI 상태
-  const { isHeaderHidden } = useLayoutStore();
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
-  const lastScrollYRef = useRef<number>(0);
 
   const hasUnsavedChanges = useMemo(
     () =>
@@ -102,6 +88,7 @@ export default function EditorPage() {
 
   // 클라이언트 초기화
   useEffect(() => {
+    setIsClient(true);
     checkDevice();
     const handleResize = () => checkDevice();
     window.addEventListener("resize", handleResize);
@@ -130,38 +117,18 @@ export default function EditorPage() {
 
   useEffect(() => {
     if (isClient) {
-      void loadSharedData(showSuccess, showError);
+      void loadSharedData();
     }
-  }, [isClient, loadSharedData, showSuccess, showError]);
-
-  // 모드 변경 핸들러
-  const handleModeChange = useCallback(
-    (mode: typeof viewMode) => {
-      setViewMode(mode);
-    },
-    [setViewMode]
-  );
-
-  const handleQuestionLimitChange = useCallback(
-    (limit: number) => {
-      setQuestionCharLimit(limit);
-    },
-    [setQuestionCharLimit]
-  );
-
-  // 문항 변경 핸들러
-  const handleQuestionChange = useCallback(
-    (text: string) => {
-      setQuestionText(text);
-    },
-    [setQuestionText]
-  );
+  }, [isClient, loadSharedData]);
 
   // 메모 핸들러
-  const handleMemoClick = useCallback((memo: (typeof memos)[0]) => {
-    setHighlightedMemo(memo.id);
-    setTimeout(() => setHighlightedMemo(null), 3000);
-  }, []);
+  const handleMemoClick = useCallback(
+    (memo: (typeof questions)[0]["memos"][0]) => {
+      setHighlightedMemo(memo.id);
+      setTimeout(() => setHighlightedMemo(null), 3000);
+    },
+    []
+  );
 
   const handleMemoHover = useCallback((memoId: string | null) => {
     setHighlightedMemo(memoId);
@@ -211,18 +178,6 @@ export default function EditorPage() {
     };
   }, [isMobileOpen, isMobile]);
 
-  const handleSelectQuestion = useCallback(
-    (questionId: string) => {
-      setActiveQuestionId(questionId);
-    },
-    [setActiveQuestionId]
-  );
-
-  const handleAddQuestion = useCallback(() => {
-    addQuestion();
-    setViewMode("original");
-  }, [addQuestion, setViewMode]);
-
   const handleDeleteCurrentQuestion = useCallback(() => {
     if (questions.length <= 1) {
       showError("마지막 문항은 삭제할 수 없습니다.");
@@ -265,10 +220,6 @@ export default function EditorPage() {
     [questions, activeQuestionId]
   );
 
-  // 통계 계산
-  const originalStats = getTextStats(originalText, questionCharLimit);
-  const editedStats = getTextStats(editedText, questionCharLimit);
-
   // 사이드바 렌더링
   const renderSidebar = () => {
     // 맞춤법 검사 모드
@@ -308,13 +259,6 @@ export default function EditorPage() {
       }`}
     >
       <EditorUpperHeader
-        viewMode={viewMode}
-        isMobile={isMobile}
-        isCollapsed={isCollapsed}
-        isHeaderVisible={!isHeaderHidden}
-        isAuthenticated={isAuthenticated}
-        canDeleteQuestion={questions.length > 1}
-        onModeChange={handleModeChange}
         onMobileMenuClick={openMobileSidebar}
         onShareClick={handleShareButtonClick}
         onDeleteClick={handleDeleteCurrentQuestion}
@@ -322,23 +266,11 @@ export default function EditorPage() {
 
       {isAuthenticated && (
         <div className="mt-16">
-          <QuestionTabs
-            questions={questions}
-            activeQuestionId={activeQuestionId}
-            onSelect={handleSelectQuestion}
-            onAdd={handleAddQuestion}
-          />
+          <QuestionTabs />
         </div>
       )}
 
       <QuestionEditor
-        viewMode={viewMode}
-        questionText={questionText}
-        questionCharLimit={questionCharLimit}
-        onQuestionChange={handleQuestionChange}
-        onQuestionLimitChange={handleQuestionLimitChange}
-        originalStats={originalStats}
-        editedStats={editedStats}
         containerClassName={isAuthenticated ? "mt-4" : undefined}
       />
 
@@ -349,48 +281,24 @@ export default function EditorPage() {
           } gap-2 mt-3`}
         >
           <div className={hasRightColumn ? "md:col-span-3" : "md:col-span-4"}>
-            {viewMode === "original" && (
-              <LazyOriginalEditor
-                originalText={originalText}
-                onOriginalChange={setOriginalText}
-              />
-            )}
+            {viewMode === "original" && <LazyOriginalEditor />}
 
             {viewMode === "edit" && (
-              <LazyEditor
-                originalText={originalText}
-                editedText={editedText}
-                onEditedChange={setEditedText}
-                onQualityCheckToggle={handleQualityCheckToggle}
-              />
+              <LazyEditor onQualityCheckToggle={handleQualityCheckToggle} />
             )}
 
             {viewMode === "result" && (
-              <LazyDiffViewer
-                originalText={originalText}
-                editedText={editedText}
-                memos={memos}
-                highlightedMemo={highlightedMemo}
-                onAddMemo={addMemo}
-              />
+              <LazyDiffViewer highlightedMemo={highlightedMemo} />
             )}
           </div>
 
           {hasRightColumn && (
             <div className="md:col-span-1">
-              {showCheckSidebar ? (
-                <div className="sticky top-24">{checkSidebar}</div>
-              ) : (
-                <EditorSidebar
-                  viewMode={viewMode}
-                  memos={memos}
-                  originalStats={originalStats}
-                  editedStats={editedStats}
-                  onDeleteMemo={deleteMemo}
-                  onMemoClick={handleMemoClick}
-                  onMemoHover={handleMemoHover}
-                />
-              )}
+              <EditorSidebar
+                onMemoClick={handleMemoClick}
+                onMemoHover={handleMemoHover}
+                renderCheckSidebar={checkSidebar}
+              />
             </div>
           )}
         </div>
@@ -400,12 +308,7 @@ export default function EditorPage() {
         <ShareButton isMobile={isMobile} onClick={handleShareButtonClick} />
       )}
 
-      {isMobile && (
-        <EditorMobileModeNav
-          viewMode={viewMode}
-          onModeChange={handleModeChange}
-        />
-      )}
+      {isMobile && <EditorMobileModeNav />}
 
       <ShareModal
         isOpen={isShareModalOpen}

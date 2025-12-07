@@ -1,24 +1,25 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
-import { EditorQuestionState } from "@/types/editor";
+import { useEditorStore } from "@/stores/editorStore";
 
-interface QuestionTabsProps {
-  questions: EditorQuestionState[];
-  activeQuestionId: string;
-  onSelect: (id: string) => void;
-  onAdd: () => void;
-}
+export default function QuestionTabs() {
+  const {
+    questions,
+    activeQuestionId,
+    setActiveQuestionId,
+    addQuestion,
+    setViewMode,
+  } = useEditorStore();
 
-export default function QuestionTabs({
-  questions,
-  activeQuestionId,
-  onSelect,
-  onAdd,
-}: QuestionTabsProps) {
   const canAdd = useMemo(() => questions.length < 10, [questions.length]);
+
+  const handleAddQuestion = useCallback(() => {
+    addQuestion();
+    setViewMode("original");
+  }, [addQuestion, setViewMode]);
 
   return (
     <div className="dark:bg-gray-900">
@@ -32,7 +33,7 @@ export default function QuestionTabs({
                 <button
                   key={question.id}
                   type="button"
-                  onClick={() => onSelect(question.id)}
+                  onClick={() => setActiveQuestionId(question.id)}
                   className={`group relative flex items-center rounded-full px-6 py-2 text-sm font-medium transition-colors whitespace-nowrap border ${
                     isActive
                       ? "border-transparent bg-brand-500 text-white shadow"
@@ -47,7 +48,7 @@ export default function QuestionTabs({
 
             <button
               type="button"
-              onClick={onAdd}
+              onClick={handleAddQuestion}
               disabled={!canAdd}
               className={`flex items-center gap-2 rounded-full px-6 py-2 text-sm font-medium transition-colors whitespace-nowrap border border-dashed ${
                 canAdd
