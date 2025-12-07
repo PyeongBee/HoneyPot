@@ -55,7 +55,7 @@ const EditorActions: React.FC<EditorActionsProps> = ({
         variant="secondary"
         className="text-sm"
       >
-        품질 검사 취소
+        {MESSAGES.BUTTONS.CANCEL_CHECK}
       </Button>
     );
   }
