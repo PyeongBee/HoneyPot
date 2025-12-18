@@ -54,8 +54,9 @@ export function useResizable({
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
+      e.stopPropagation();
       setIsResizing(true);
-      startYRef.current = e.clientY;
+      startYRef.current = e.pageY;
       startHeightRef.current = height;
     },
     [height]
@@ -64,10 +65,16 @@ export function useResizable({
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
       // 터치 이벤트 전파 방지 (스크롤 등)
-      // e.preventDefault()는 passive listener에서는 무시될 수 있음
-      setIsResizing(true);
-      startYRef.current = e.touches[0].clientY;
-      startHeightRef.current = height;
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+      e.stopPropagation();
+
+      if (e.touches.length > 0) {
+        setIsResizing(true);
+        startYRef.current = e.touches[0].pageY;
+        startHeightRef.current = height;
+      }
     },
     [height]
   );
@@ -76,7 +83,7 @@ export function useResizable({
     (e: MouseEvent) => {
       if (!isResizing) return;
 
-      const deltaY = e.clientY - startYRef.current;
+      const deltaY = e.pageY - startYRef.current;
       const newHeight = startHeightRef.current + deltaY;
 
       setHeight(Math.max(minHeight, Math.min(maxHeight, newHeight)));
@@ -92,10 +99,12 @@ export function useResizable({
         e.preventDefault(); // 스크롤 방지
       }
 
-      const deltaY = e.touches[0].clientY - startYRef.current;
-      const newHeight = startHeightRef.current + deltaY;
+      if (e.touches.length > 0) {
+        const deltaY = e.touches[0].pageY - startYRef.current;
+        const newHeight = startHeightRef.current + deltaY;
 
-      setHeight(Math.max(minHeight, Math.min(maxHeight, newHeight)));
+        setHeight(Math.max(minHeight, Math.min(maxHeight, newHeight)));
+      }
     },
     [isResizing, minHeight, maxHeight]
   );
@@ -119,7 +128,9 @@ export function useResizable({
     if (isResizing) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
-      document.addEventListener("touchmove", handleTouchMove, { passive: false });
+      document.addEventListener("touchmove", handleTouchMove, {
+        passive: false,
+      });
       document.addEventListener("touchend", handleTouchEnd);
       document.body.style.cursor = "ns-resize";
       document.body.style.userSelect = "none";
