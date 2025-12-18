@@ -23,7 +23,7 @@
     "hanspell": "^0.9.7",
     "immer": "^11.0.1",
     "lucide-react": "^0.544.0",
-    "next": "15.5.7",
+    "next": "15.5.9",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "zustand": "^5.0.8"
